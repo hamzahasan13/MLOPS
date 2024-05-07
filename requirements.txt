@@ -1,4 +1,10 @@
 pandas
 numpy
 seaborn
+scipy
+matplotlib
+missingno
+plotly
+scikit-learn
+xgboost
 -e .
