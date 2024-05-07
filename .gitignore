@@ -4,3 +4,4 @@ src/components/logs
 src/logs
 artifacts
 logs
+notebook/data/cars.csv
