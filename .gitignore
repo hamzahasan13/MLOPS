@@ -1,5 +1,6 @@
 mlops_env
 MLOps_Project.egg-info
+src/components/logs
 src/logs
 .artifacts
 .logs
