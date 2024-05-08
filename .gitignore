@@ -1,7 +1,10 @@
-mlops_env
-MLOps_Project.egg-info
-src/components/logs
-src/logs
-artifacts
-logs
+/mlops_env/
+/MLOps_Project.egg-info/
+/src/components/logs/
+/src/logs/
+/artifacts/
+/logs/
 notebook/data/cars.csv
+
+## Ignore Python cache files
+__pycache__/

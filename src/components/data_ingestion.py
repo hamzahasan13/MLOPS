@@ -23,7 +23,7 @@ class DataIngestion:
         
         ## Catches any exceptions that occur during the data ingestion process
         try:
-            df = pd.read_csv('notebook/data/cars.csv')
+            df = pd.read_csv('artifacts/cleaned_data.csv')
             logging.info('Read the data into dataframe')
             
             os.makedirs(os.path.dirname(self.ingestion_config.train_data_path), exist_ok=True)
