@@ -8,4 +8,5 @@ plotly
 scikit-learn
 xgboost
 dill
+Flask
 -e .

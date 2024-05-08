@@ -1,0 +1,74 @@
+<html>
+<body>
+    <div class="login">
+       <h1>Used Cars Price Predictor</h1>
+   
+       <form action="{{ url_for('predict_datapoint')}}" method="post">
+        <h1>
+            <legend>Used Cars Price Predictor</legend>
+        </h1>
+        <div class="mb-3">
+            <label class="form-label">Horsepower</label>
+            <input class="form-control" type="number" name="horsepower" placeholder="Enter Horsepower" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Kilometers Driven</label>
+            <input class="form-control" type="number" name="kilometer" placeholder="Enter Kilometers Driven" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Risk Level</label>
+            <select class="form-control" name="risk_level" placeholder="Enter Risk Level" required>
+                <option class="placeholder" selected disabled value="">Select Risk Level</option>
+                <option value="Low">
+                    Low
+                </option>
+                <option value="High">
+                    High
+                </option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Fuel Type</label>
+            <select class="form-control" name="fuel_type" placeholder="Enter Fuel Type" required>
+                <option class="placeholder" selected disabled value="">Select Fuel Type</option>
+                <option value="Diesel">
+                    Diesel
+                </option>
+                <option value="Petrol">
+                    Petrol
+                </option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Vehicle Type</label>
+            <select class="form-control" name="vehicle_type" placeholder="Enter Vehicle Type" required>
+                <option class="placeholder" selected disabled value="">Select Vehicle Type</option>
+                <option value="Convertible">
+                    Convertible
+                </option>
+                <option value="Non-Convertible">
+                    Non-Convertible
+                </option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Gearbox Type</label>
+            <select class="form-control" name="gearbox" placeholder="Enter Gearbox Type" required>
+                <option class="placeholder" selected disabled value="">Select Gearbox Type</option>
+                <option value="Automatic">
+                    Automatic
+                </option>
+                <option value="Manual">
+                    Manual
+                </option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <input class="btn btn-primary" type="submit" value="Predict your Vehicle's Performance" />
+        </div>
+    </form>
+    <h2>
+       The predicted performance is: {{results}}
+    </h2>
+   </body>
+</html>
