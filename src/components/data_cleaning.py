@@ -72,25 +72,25 @@ class DataCleaning:
         This function translates and maps German words to English words.
         """
     
-        df['Seller'] = df['Seller'].replace({'privat': 'Private', 'gewerblich': 'Commercial'});
+        df['Seller'] = df['Seller'].replace({'Privat': 'Private', 'Gewerblich': 'Commercial'});
         df['offerType'] = df['offerType'].replace({'Angebot': 'Customer Offer', 'Gesuch': 'Company Offer'});
-        df['gearbox'] = df['gearbox'].replace({'manuell': 'Manual', 'automatik': 'Automatic'});
-        df['vehicleType'] = df['vehicleType'].replace({'limousine': 'Limousine', 'kleinwagen': 'Compact Car',
-                                                'kombi':'Station Wagon', 'bus':'Bus', 'cabrio': 'Convertible', 
-                                                'coupe': 'Coupe', 'suv': 'SUV', 'andere': 'Other'});
+        df['gearbox'] = df['gearbox'].replace({'Manuell': 'Manual', 'Automatik': 'Automatic'});
+        df['vehicleType'] = df['vehicleType'].replace({'Limousine': 'Limousine', 'Kleinwagen': 'Compact Car',
+                                                'Kombi':'Station Wagon', 'Bus':'Bus', 'Cabrio': 'Convertible', 
+                                                'Coupe': 'Coupe', 'Suv': 'SUV', 'Andere': 'Other'});
         
-        df['model'] = df['model'].replace({'golf': 'Golf', 'e_klasse': 'E-Class','3er':'3-series', 
-                                    'polo': 'Polo', 'a4': 'A4', 'corsa':'Corsa', 
-                                    'astra':'Astra', 'passat': 'Passat', 'a3': 'A3',
-                                    'c_klasse': 'C-Class','5er': '5-Series', 'andere': 'Other',
-                                    'a6': 'A6', 'focus': 'Focus', 'fiesta': 'Fiesta',
-                                    'twingo': 'Twingo'});
+        df['model'] = df['model'].replace({'Golf': 'Golf', 'E_klasse': 'E-Class','3er':'3-series', 
+                                    'Polo': 'Polo', 'A4': 'A4', 'Corsa':'Corsa', 
+                                    'Astra':'Astra', 'Passat': 'Passat', 'A3': 'A3',
+                                    'C_klasse': 'C-Class','5er': '5-Series', 'Andere': 'Other',
+                                    'A6': 'A6', 'Focus': 'Focus', 'Fiesta': 'Fiesta',
+                                    'Twingo': 'Twingo'});
         
-        df['fuelType'] = df['fuelType'].replace({'benzin':'Gasoline', 'diesel':'Diesel', 'lpg':'LPG', 
-                                                        'cng':'CNG', 'hybrid':'Hybrid', 'andere':'Other', 
-                                                        'elektro':'Electric'});
+        df['fuelType'] = df['fuelType'].replace({'Benzin':'Gasoline', 'Diesel':'Diesel', 'Lpg':'LPG', 
+                                                        'Cng':'CNG', 'Hybrid':'Hybrid', 'Andere':'Other', 
+                                                        'Elektro':'Electric'});
         
-        df['NotRepaired/Damaged'] = df['NotRepaired/Damaged'].replace({'nein':'No', 'ja':'Yes'});
+        df['NotRepaired/Damaged'] = df['NotRepaired/Damaged'].replace({'Nein':'No', 'Ja':'Yes'});
         
         return df
     
@@ -140,8 +140,6 @@ class DataCleaning:
         df = self.fill_missing(df)
         df = self.capitalize_letters(df)
         df = self.obs_mapping(df)
-        #print(df.columns)
-        #df = self.cat_imputing(df)
         df = self.data_filtering(df)
         df = self.drop_cols(df)
         
