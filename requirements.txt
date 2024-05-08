@@ -7,4 +7,5 @@ missingno
 plotly
 scikit-learn
 xgboost
+dill
 -e .

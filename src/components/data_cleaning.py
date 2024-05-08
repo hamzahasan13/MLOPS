@@ -127,7 +127,8 @@ class DataCleaning:
         """
         This function drops irrelevant columns.
         """
-        cols_to_drop = ['index', 'nrOfPictures', 'postalCode', 'dateCrawled', 'name', 'dateCreated', 'lastSeen', 'Registration_Month'];
+        cols_to_drop = ['index', 'nrOfPictures', 'postalCode', 'dateCrawled', 'name', 'dateCreated', 'lastSeen', 'Registration_Month',
+                        'model', 'brand'];
         df.drop(cols_to_drop, axis=1, inplace=True);
         
         return (df)
@@ -140,7 +141,7 @@ class DataCleaning:
         df = self.capitalize_letters(df)
         df = self.obs_mapping(df)
         #print(df.columns)
-        df = self.cat_imputing(df)
+        #df = self.cat_imputing(df)
         df = self.data_filtering(df)
         df = self.drop_cols(df)
         
