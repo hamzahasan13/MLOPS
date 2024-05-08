@@ -74,11 +74,10 @@ class DataTransformation:
             
             target_col_name = 'Price'
             numerical_columns = ['HorsePower', 'kilometer']
+            categorical_columns = ['Seller', 'offerType', 'abtest', 'vehicleType', 'gearbox', 'fuelType', 'NotRepaired/Damaged','Risk_Level']
             
             input_feature_train_df = train_df.drop(columns = [target_col_name], axis=1)
             target_feature_train_df = train_df[target_col_name]
-            
-            print(input_feature_train_df)
             
             input_feature_test_df = test_df.drop(columns = [target_col_name], axis=1)
             target_feature_test_df = test_df[target_col_name]
@@ -87,12 +86,21 @@ class DataTransformation:
 
             input_feature_train_arr=preprocessing_obj.fit_transform(input_feature_train_df)
             input_feature_test_arr=preprocessing_obj.transform(input_feature_test_df)
-
-            target_feature_train_arr = np.array(target_feature_train_df).reshape(-1, 1)
-            target_feature_test_arr = np.array(target_feature_test_df).reshape(-1, 1)
-
-            train_arr = np.vstack((input_feature_train_arr, target_feature_train_arr))
-            test_arr = np.vstack((input_feature_test_arr, target_feature_test_arr))
+            
+            transformed_columns = (
+            preprocessing_obj.named_transformers_['num_pipeline'].named_steps['scaler'].get_feature_names_out(numerical_columns).tolist()
+            + preprocessing_obj.named_transformers_['cat_pipeline'].named_steps['one_hot_encoder'].get_feature_names_out(categorical_columns).tolist()
+            )
+            
+            dense_input_feature_train_arr = input_feature_train_arr.toarray()
+            dense_input_feature_test_arr = input_feature_test_arr.toarray()
+            
+            # Create DataFrame using dense matrix and column names
+            input_feature_train_arr = pd.DataFrame(dense_input_feature_train_arr, columns=transformed_columns)
+            input_feature_test_arr = pd.DataFrame(dense_input_feature_test_arr, columns=transformed_columns)
+        
+            train_arr = pd.concat([input_feature_train_arr, target_feature_train_df], axis=1)            
+            test_arr = pd.concat([input_feature_test_arr, target_feature_test_df], axis=1)
 
             logging.info(f"Saved preprocessing object.")
             
