@@ -21,6 +21,7 @@ from src.exception import CustomException
 from src.logger import logging
 
 from src.utils import save_obj, evaluate_models
+from data_transformation import DataTransformationConfig
     
 @dataclass
 class ModelTrainerConfig:
@@ -30,6 +31,7 @@ class ModelTrainer:
     def __init__(self):
         
         self.model_trainer_config=ModelTrainerConfig()
+        self.data_transformation_config = DataTransformationConfig()
 
 
     def initiate_model_trainer(self, train_array, test_array, input_feature_train_df, input_feature_test_df):
@@ -116,11 +118,6 @@ class ModelTrainer:
             if best_model_score<0.6:
                 raise CustomException("No best model found")
             logging.info(f"Best found model on both training and testing dataset")
-
-            save_obj(
-                file_path=self.model_trainer_config.trained_model_file_path,
-                obj=best_model
-            )
             
             feature_importances = best_model.feature_importances_
             feature_importance_df = pd.DataFrame({'Feature': X_train.columns, 'Importance': feature_importances})
@@ -191,6 +188,18 @@ class ModelTrainer:
             # Save cleaned data to a new CSV file in the artifacts folder
             train_set.to_csv(final_X_train_path, index=False)
             test_set.to_csv(final_X_test_path, index=False)
+            
+            
+            
+            save_obj(
+                file_path = self.data_transformation_config.preprocessor_obj_file_path,
+                obj = preprocessor_selected
+            )
+            
+            save_obj(
+                file_path=self.model_trainer_config.trained_model_file_path,
+                obj=best_model
+            )
             
             #predicted=best_model.predict(X_test)
             
