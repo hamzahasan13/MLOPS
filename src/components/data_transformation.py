@@ -26,12 +26,12 @@ class DataTransformation:
     
     def __init__(self):
         self.data_transformation_config = DataTransformationConfig()
-        
+
     def get_data_transformer_obj(self):
         
         try:
             numerical_columns = ['HorsePower', 'kilometer']
-            categorical_columns = ['Seller', 'offerType', 'abtest', 'vehicleType', 'gearbox', 'fuelType', 'NotRepaired/Damaged','Risk_Level']
+            categorical_columns = ['Seller', 'offerType', 'abtest', 'vehicleType', 'gearbox', 'fuelType', 'NotRepaired/Damaged','RiskLevel']
             
             num_pipeline = Pipeline(
                 steps = [
@@ -74,7 +74,7 @@ class DataTransformation:
             
             target_col_name = 'Price'
             numerical_columns = ['HorsePower', 'kilometer']
-            categorical_columns = ['Seller', 'offerType', 'abtest', 'vehicleType', 'gearbox', 'fuelType', 'NotRepaired/Damaged','Risk_Level']
+            categorical_columns = ['Seller', 'offerType', 'abtest', 'vehicleType', 'gearbox', 'fuelType', 'NotRepaired/Damaged','RiskLevel']
             
             input_feature_train_df = train_df.drop(columns = [target_col_name], axis=1)
             target_feature_train_df = train_df[target_col_name]
@@ -109,7 +109,7 @@ class DataTransformation:
                 obj = preprocessing_obj
             )
 
-            return(train_arr, test_arr, self.data_transformation_config.preprocessor_obj_file_path)
+            return(train_arr, test_arr, self.data_transformation_config.preprocessor_obj_file_path, input_feature_train_df, input_feature_test_df)
             
         except Exception as e:
             raise CustomException(e, sys)

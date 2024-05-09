@@ -2,6 +2,11 @@ import os
 import sys
 import pandas as pd
 from dataclasses import dataclass
+
+from sklearn.compose import ColumnTransformer
+from sklearn.impute import SimpleImputer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder,StandardScaler
 from sklearn.ensemble import (
     ExtraTreesRegressor,
     GradientBoostingRegressor,
@@ -27,7 +32,7 @@ class ModelTrainer:
         self.model_trainer_config=ModelTrainerConfig()
 
 
-    def initiate_model_trainer(self, train_array, test_array):
+    def initiate_model_trainer(self, train_array, test_array, input_feature_train_df, input_feature_test_df):
         try:
             
 
@@ -38,6 +43,8 @@ class ModelTrainer:
                 test_array.iloc[:, :-1],
                 test_array.iloc[:, -1]
             )
+            
+            X_orig = pd.concat([input_feature_train_df, input_feature_test_df]).reset_index(drop=True)
             
             models = {
                 'Linear Regression': LinearRegression(),
@@ -104,7 +111,7 @@ class ModelTrainer:
                 list(model_report.values()).index(best_model_score)
             ]
             best_model = models[best_model_name]
-            print(best_model)
+            #print(best_model)
 
             if best_model_score<0.6:
                 raise CustomException("No best model found")
@@ -125,10 +132,55 @@ class ModelTrainer:
 
             # Selecting features above the threshold
             selected_features = feature_importance_df[feature_importance_df['Importance'] >= threshold]['Feature'].tolist()
-            # Dropping columns below the threshold from the dataset
             
-            X_train_selected = X_train[selected_features]
-            X_test_selected = X_test[selected_features]
+            original_columns = set(feature.split('_', 1)[0] for feature in selected_features)
+            
+            X_orig_selected = X_orig[list(original_columns)]
+            
+            numeric_columns = X_orig_selected.select_dtypes(include=['number']).columns
+            categorical_columns = X_orig_selected.select_dtypes(include=['object', 'category']).columns
+            
+            num_pipeline = Pipeline(
+                steps = [
+                    ('imputer', SimpleImputer(strategy='median')),
+                     ('scaler', StandardScaler())
+                ]
+            )
+            
+            cat_pipeline = Pipeline(
+                steps = [
+                    ('imputer', SimpleImputer(strategy='most_frequent')),
+                    ('one_hot_encoder', OneHotEncoder()),
+                    ('scaler', StandardScaler(with_mean=False))
+                ]
+            )
+            logging.info("Preprocessing Serving Request Data");
+            
+            preprocessor_selected = ColumnTransformer(
+                [
+                    ("num_pipeline", num_pipeline, numeric_columns),
+                    ('cat_pipeline', cat_pipeline, categorical_columns)
+                ]
+            )
+            
+            train_set, test_set = train_test_split(X_orig_selected, test_size=0.2, random_state=42)
+            
+            logging.info("Applying preprocessing object on feature selected training df and testing df.")
+
+            input_feature_train_arr=preprocessor_selected.fit_transform(train_set)
+            input_feature_test_arr=preprocessor_selected.transform(test_set)
+            
+            transformed_columns = (
+            preprocessor_selected.named_transformers_['num_pipeline'].named_steps['scaler'].get_feature_names_out(numeric_columns).tolist()
+            + preprocessor_selected.named_transformers_['cat_pipeline'].named_steps['one_hot_encoder'].get_feature_names_out(categorical_columns).tolist()
+            )
+            
+            dense_input_feature_train_arr = input_feature_train_arr.toarray()
+            dense_input_feature_test_arr = input_feature_test_arr.toarray()
+            
+            # Create DataFrame using dense matrix and column names
+            input_feature_train_arr_df = pd.DataFrame(dense_input_feature_train_arr, columns=transformed_columns)
+            input_feature_test_arr_df = pd.DataFrame(dense_input_feature_test_arr, columns=transformed_columns)
             
             # Specify the path to save the cleaned data
             final_X_train_path = os.path.join('artifacts', 'final_X_train.csv')
@@ -137,10 +189,10 @@ class ModelTrainer:
             os.makedirs(os.path.dirname(final_X_test_path), exist_ok=True)
             
             # Save cleaned data to a new CSV file in the artifacts folder
-            X_train_selected.to_csv(final_X_train_path, index=False)
-            X_test_selected.to_csv(final_X_test_path, index=False)
+            train_set.to_csv(final_X_train_path, index=False)
+            test_set.to_csv(final_X_test_path, index=False)
             
-            predicted=best_model.predict(X_test)
+            #predicted=best_model.predict(X_test)
             
             r2_square = r2_score(y_test, predicted)
             return r2_square

@@ -120,7 +120,7 @@ class DataCleaning:
         risk_levels = df['Registration_Year'].apply(lambda x: 'High' if 1950 <= x <= 2000 else 'Medium' if 2000 < x <= 2010 else 'Low')
 
         # Assign the Series to the 'Risk_Level' column using .loc
-        df.loc[:, 'Risk_Level'] = risk_levels
+        df.loc[:, 'RiskLevel'] = risk_levels
         return (df)
     
     def drop_cols(self, df):
