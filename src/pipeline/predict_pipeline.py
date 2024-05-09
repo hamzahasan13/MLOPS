@@ -17,42 +17,19 @@ class PredictPipeline:
     def predict(self, features):
         try:
             model_path = 'artifacts/model.pkl'
-            preprocessor_path = 'artifacts/preprocessed.pkl'
-        
-            numeric_columns = features.select_dtypes(include=['number']).columns
-            categorical_columns = features.select_dtypes(include=['object', 'category']).columns
-            
-            num_pipeline = Pipeline(
-                steps = [
-                    ('imputer', SimpleImputer(strategy='median')),
-                     ('scaler', StandardScaler())
-                ]
-            )
-            
-            cat_pipeline = Pipeline(
-                steps = [
-                    ('imputer', SimpleImputer(strategy='most_frequent')),
-                    ('one_hot_encoder', OneHotEncoder()),
-                    ('scaler', StandardScaler(with_mean=False))
-                ]
-            )
-            logging.info("Preprocessing Serving Request Data");
-            
-            preprocessor_serv = ColumnTransformer(
-                [
-                    ("num_pipeline", num_pipeline, numeric_columns),
-                    ('cat_pipeline', cat_pipeline, categorical_columns)
-                ]
-            )
-            
-            preprocessed_serving = preprocessor_serv.fit_transform(features)
-            
+            preprocessor_path = 'artifacts/preprocessor.pkl'
+
             model = load_object(file_path = model_path);
+            preprocessor = load_object(file_path=preprocessor_path)
             
-            #preprocessor = load_object(file_path=preprocessor_path)
-            
-            #data_scaled = preprocessor.transform(features)
-            preds = model.predict(preprocessed_serving)
+            original_columns = set(feature.split('_', 1)[0] for feature in features)
+            print('X0')
+            print(features)
+            print('X0')
+            print(original_columns)
+            print('X1')
+            data_scaled = preprocessor.transform(features[list[original_columns]])
+            preds = model.predict(data_scaled)
             return (preds)
 
         except Exception as e:
@@ -60,13 +37,13 @@ class PredictPipeline:
         
     
 class CustomData:
-    def __init__(self, HorsePower: int, kilometer: int, Risk_Level_Low: str, Risk_Level_High: str, fuelType_Diesel: str, 
+    def __init__(self, HorsePower: int, kilometer: int, RiskLevel_Low: str, RiskLevel_High: str, fuelType_Diesel: str, 
                  vehicleType_Convertible: str, gearbox_Automatic: str):
         
         self.HorsePower = HorsePower
         self.kilometer = kilometer
-        self.Risk_Level_Low = Risk_Level_Low
-        self.Risk_Level_High = Risk_Level_High
+        self.RiskLevel_Low = RiskLevel_Low
+        self.RiskLevel_High = RiskLevel_High
         self.fuelType_Diesel = fuelType_Diesel
         self.vehicleType_Convertible = vehicleType_Convertible
         self.gearbox_Automatic = gearbox_Automatic
@@ -77,8 +54,8 @@ class CustomData:
             custom_data_input_dict = {
                 "HorsePower": [self.HorsePower],
                 "kilometer": [self.kilometer],
-                "Risk_Level_Low": [self.Risk_Level_Low],
-                "Risk_Level_High": [self.Risk_Level_High],
+                "RiskLevel_Low": [self.RiskLevel_Low],
+                "RiskLevel_High": [self.RiskLevel_High],
                 "fuelType_Diesel": [self.fuelType_Diesel],
                 "vehicleType_Convertible": [self.vehicleType_Convertible],
                 "gearbox_Automatic": [self.gearbox_Automatic]

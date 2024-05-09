@@ -25,8 +25,8 @@ def predict_datapoint():
         data = CustomData(
             HorsePower = float(request.form.get("HorsePower")),
             kilometer = float(request.form.get("kilometer")),
-            Risk_Level_Low = request.form.get("Risk_Level_Low"),
-            Risk_Level_High = request.form.get("Risk_Level_High"),
+            RiskLevel_Low = request.form.get("RiskLevel_Low"),
+            RiskLevel_High = request.form.get("RiskLevel_High"),
             fuelType_Diesel = request.form.get("fuelType_Diesel"),
             vehicleType_Convertible = request.form.get("vehicleType_Convertible"),
             gearbox_Automatic = request.form.get("gearbox_Automatic"),
