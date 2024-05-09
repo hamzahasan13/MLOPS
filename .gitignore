@@ -8,3 +8,5 @@ notebook/data/cars.csv
 
 ## Ignore Python cache files
 __pycache__/
+
+.DS_Store/

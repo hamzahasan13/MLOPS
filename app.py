@@ -23,8 +23,8 @@ def predict_datapoint():
     
     else:
         data = CustomData(
-            HorsePower = request.form.get("HorsePower"),
-            kilometer = request.form.get("kilometer"),
+            HorsePower = float(request.form.get("HorsePower")),
+            kilometer = float(request.form.get("kilometer")),
             Risk_Level_Low = request.form.get("Risk_Level_Low"),
             Risk_Level_High = request.form.get("Risk_Level_High"),
             fuelType_Diesel = request.form.get("fuelType_Diesel"),

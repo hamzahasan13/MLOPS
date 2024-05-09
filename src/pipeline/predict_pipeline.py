@@ -3,6 +3,13 @@ import pandas as pd
 from src.exception import CustomException
 from src.utils import load_object
 
+from sklearn.compose import ColumnTransformer
+from sklearn.impute import SimpleImputer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder,StandardScaler
+
+from src.logger import logging
+
 class PredictPipeline:
     def __init__(self):
         pass
@@ -11,13 +18,41 @@ class PredictPipeline:
         try:
             model_path = 'artifacts/model.pkl'
             preprocessor_path = 'artifacts/preprocessed.pkl'
-            model = load_object(file_path = model_path);
-            print('H1')
-            preprocessor = load_object(file_path=preprocessor_path)
-            print(features)
+        
+            numeric_columns = features.select_dtypes(include=['number']).columns
+            categorical_columns = features.select_dtypes(include=['object', 'category']).columns
             
-            data_scaled = preprocessor.transform(features)
-            preds = model.predict(data_scaled)
+            num_pipeline = Pipeline(
+                steps = [
+                    ('imputer', SimpleImputer(strategy='median')),
+                     ('scaler', StandardScaler())
+                ]
+            )
+            
+            cat_pipeline = Pipeline(
+                steps = [
+                    ('imputer', SimpleImputer(strategy='most_frequent')),
+                    ('one_hot_encoder', OneHotEncoder()),
+                    ('scaler', StandardScaler(with_mean=False))
+                ]
+            )
+            logging.info("Preprocessing Serving Request Data");
+            
+            preprocessor_serv = ColumnTransformer(
+                [
+                    ("num_pipeline", num_pipeline, numeric_columns),
+                    ('cat_pipeline', cat_pipeline, categorical_columns)
+                ]
+            )
+            
+            preprocessed_serving = preprocessor_serv.fit_transform(features)
+            
+            model = load_object(file_path = model_path);
+            
+            #preprocessor = load_object(file_path=preprocessor_path)
+            
+            #data_scaled = preprocessor.transform(features)
+            preds = model.predict(preprocessed_serving)
             return (preds)
 
         except Exception as e:
@@ -25,7 +60,7 @@ class PredictPipeline:
         
     
 class CustomData:
-    def __init__(self, HorsePower: str, kilometer: str, Risk_Level_Low: str, Risk_Level_High: str, fuelType_Diesel: str, 
+    def __init__(self, HorsePower: int, kilometer: int, Risk_Level_Low: str, Risk_Level_High: str, fuelType_Diesel: str, 
                  vehicleType_Convertible: str, gearbox_Automatic: str):
         
         self.HorsePower = HorsePower
