@@ -46,6 +46,7 @@ class ModelTrainer:
                 test_array.iloc[:, -1]
             )
             
+            
             X_orig = pd.concat([input_feature_train_df, input_feature_test_df]).reset_index(drop=True)
             
             models = {
@@ -119,6 +120,7 @@ class ModelTrainer:
                 raise CustomException("No best model found")
             logging.info(f"Best found model on both training and testing dataset")
             
+            """
             feature_importances = best_model.feature_importances_
             feature_importance_df = pd.DataFrame({'Feature': X_train.columns, 'Importance': feature_importances})
 
@@ -179,6 +181,7 @@ class ModelTrainer:
             input_feature_train_arr_df = pd.DataFrame(dense_input_feature_train_arr, columns=transformed_columns)
             input_feature_test_arr_df = pd.DataFrame(dense_input_feature_test_arr, columns=transformed_columns)
             
+            
             # Specify the path to save the cleaned data
             final_X_train_path = os.path.join('artifacts', 'final_X_train.csv')
             final_X_test_path = os.path.join('artifacts', 'final_X_test.csv')
@@ -190,20 +193,23 @@ class ModelTrainer:
             test_set.to_csv(final_X_test_path, index=False)
             
             
-            
             save_obj(
                 file_path = self.data_transformation_config.preprocessor_obj_file_path,
                 obj = preprocessor_selected
             )
+            
+            Serving_model = best_model.fit(input_feature_train_arr_df, y_train)
+            """
+            
+            predicted=best_model.predict(X_test)
+            
+            r2_square = r2_score(y_test, predicted)
             
             save_obj(
                 file_path=self.model_trainer_config.trained_model_file_path,
                 obj=best_model
             )
             
-            predicted=best_model.predict(X_test)
-            
-            r2_square = r2_score(y_test, predicted)
             return r2_square
             
         except Exception as e:

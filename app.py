@@ -23,19 +23,20 @@ def predict_datapoint():
     
     else:
         data = CustomData(
+            
+            RiskLevel = request.form.get("RiskLevel"),
+            fuelType = request.form.get("fuelType"),
+            vehicleType = request.form.get("vehicleType"),
+            gearbox = request.form.get("gearbox"),
             HorsePower = float(request.form.get("HorsePower")),
             kilometer = float(request.form.get("kilometer")),
-            RiskLevel_Low = request.form.get("RiskLevel_Low"),
-            RiskLevel_High = request.form.get("RiskLevel_High"),
-            fuelType_Diesel = request.form.get("fuelType_Diesel"),
-            vehicleType_Convertible = request.form.get("vehicleType_Convertible"),
-            gearbox_Automatic = request.form.get("gearbox_Automatic"),
         )
         pred_df = data.get_data_as_data_frame()
         
         predict_pipeline = PredictPipeline()
         results = predict_pipeline.predict(pred_df)
-        return (render_template('home.html', results = results[0]))
+
+        return (render_template('home.html', results = results))
     
     
 if __name__ == "__main__":
