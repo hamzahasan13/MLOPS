@@ -206,7 +206,6 @@ class ModelTrainer:
             original_columns = set(feature.split('_', 1)[0] for feature in X_train)
             
             X_orig_selected = X_orig[list(original_columns)]
-            print(X_orig_selected)
             
             r2_square = r2_score(y_test, predicted)
             
