@@ -1,0 +1,75 @@
+/* styles.css */
+
+/* Styling for the entire body */
+body {
+    font: 15px/1.5 Arial, Helvetica, sans-serif;
+    padding: 20px;
+    background-color: #f4f3f3;
+}
+
+/* Styling for the login container */
+.login {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Styling for the heading */
+.login h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Styling for the form elements */
+.login form {
+    margin-bottom: 20px;
+}
+
+/* Styling for form labels */
+.login form .form-label {
+    font-weight: bold;
+}
+
+/* Styling for form inputs */
+.login form .form-control {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+/* Styling for form select dropdowns */
+.login form .form-control.select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding: 10px;
+    width: 100%;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background: url('static/wallpaper.jpg') no-repeat right;
+    background-size: contain;
+}
+
+/* Styling for form submit button */
+.login form .btn-primary {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* Styling for the prediction results */
+.login h2 {
+    text-align: center;
+    color: #007bff;
+}

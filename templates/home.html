@@ -1,4 +1,8 @@
 <html>
+    <head>
+        <!-- Linking the CSS file -->
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    </head>
 <body>
     <div class="login">
    
@@ -57,7 +61,7 @@
                 <option value="Limousine">
                     Limousine
                 </option>
-                <option value="Other">
+                <option value="other">
                     Other
                 </option>
                 <option value="Station Wagon">
@@ -133,7 +137,7 @@
         </div>
     </form>
     <h2>
-       The predicted performance is: {{results}}
+       The predicted price is: ${{results}}
     </h2>
    </body>
 </html>
