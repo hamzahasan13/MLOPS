@@ -36,7 +36,7 @@ class DataCleaning:
         This function changes the name of columns for better readability.
         """
         df.rename(columns={'yearOfRegistration':'Registration_Year', 'powerPS':'HorsePower', 'monthOfRegistration':'Registration_Month', 
-                           'notRepairedDamage':'NotRepaired/Damaged','price':'Price', 'seller':'Seller'}, inplace=True)
+                           'notRepairedDamage':'NotRepairedDamaged','price':'Price', 'seller':'Seller'}, inplace=True)
         
         return (df)
         
@@ -48,7 +48,7 @@ class DataCleaning:
         df.loc[:, 'gearbox'] = df['gearbox'].fillna("Unknown")
         df.loc[:, 'model'] = df['model'].fillna("Unknown")
         df.loc[:, 'fuelType'] = df['fuelType'].fillna("Unknown")
-        df.loc[:, 'NotRepaired/Damaged'] = df['NotRepaired/Damaged'].fillna("Unknown")
+        df.loc[:, 'NotRepairedDamaged'] = df['NotRepairedDamaged'].fillna("Unknown")
         
         return df
         
@@ -90,7 +90,7 @@ class DataCleaning:
                                                         'Cng':'CNG', 'Hybrid':'Hybrid', 'Andere':'Other', 
                                                         'Elektro':'Electric'});
         
-        df['NotRepaired/Damaged'] = df['NotRepaired/Damaged'].replace({'Nein':'No', 'Ja':'Yes'});
+        df['NotRepairedDamaged'] = df['NotRepairedDamaged'].replace({'Nein':'No', 'Ja':'Yes'});
         
         return df
     
@@ -99,7 +99,7 @@ class DataCleaning:
         This code imputes missing values in the categorical variables
         """
         
-        cols_to_impute = ['vehicleType', 'gearbox', 'model', 'fuelType', 'NotRepaired/Damaged']
+        cols_to_impute = ['vehicleType', 'gearbox', 'model', 'fuelType', 'NotRepairedDamaged']
 
         imputer = SimpleImputer(strategy='most_frequent')
         imputed_data = imputer.fit_transform(df[cols_to_impute])

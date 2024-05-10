@@ -43,11 +43,29 @@
             <label class="form-label">vehicleType</label>
             <select class="form-control" name="vehicleType" placeholder="Enter Vehicle Type" required>
                 <option class="placeholder" selected disabled value="">Select Vehicle Type</option>
+                <option value="Bus">
+                    Bus
+                </option>
+                <option value="Compact Car">
+                    Compact Car
+                </option>
                 <option value="Convertible">
                     Convertible
                 </option>
-                <option value="Non-Convertible">
-                    Non-Convertible
+                <option value="Coupe">
+                    Coupe
+                </option>
+                <option value="Limousine">
+                    Limousine
+                </option>
+                <option value="Other">
+                    Other
+                </option>
+                <option value="Station Wagon">
+                    Station Wagon
+                </option>
+                <option value="SUV">
+                    SUV
                 </option>
             </select>
         </div>
@@ -64,11 +82,59 @@
             </select>
         </div>
         <div class="mb-3">
+            <label class="form-label">Seller</label>
+            <select class="form-control" name="Seller" placeholder="Enter Seller" required>
+                <option class="placeholder" selected disabled value="">Select Seller</option>
+                <option value="Private">
+                    Private
+                </option>
+                <option value="Commercial">
+                    Commercial
+                </option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">NotRepairedDamaged</label>
+            <select class="form-control" name="NotRepairedDamaged" placeholder="Enter Not Repaired Damaged" required>
+                <option class="placeholder" selected disabled value="">Select Not Repaired Damaged</option>
+                <option value="Yes">
+                    Yes
+                </option>
+                <option value="No">
+                    No
+                </option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">abtest</label>
+            <select class="form-control" name="abtest" placeholder="Enter Abtest" required>
+                <option class="placeholder" selected disabled value="">Select Abtest</option>
+                <option value="Test">
+                    Test
+                </option>
+                <option value="Control">
+                    Control
+                </option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">offerType</label>
+            <select class="form-control" name="offerType" placeholder="Enter Offer Type" required>
+                <option class="placeholder" selected disabled value="">Select Offer Type</option>
+                <option value="Customer Offer">
+                    Customer Offer
+                </option>
+                <option value="Company Offer">
+                    Company Offer
+                </option>
+            </select>
+        </div>
+        <div class="mb-3">
             <input class="btn btn-primary" type="submit" value="Predict your Vehicle's Price" />
         </div>
     </form>
     <h2>
-       The predicted performance is: {{results}}
+       The predicted performance is: ${{results}}
     </h2>
    </body>
 </html>

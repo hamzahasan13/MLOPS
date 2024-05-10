@@ -30,6 +30,11 @@ def predict_datapoint():
             gearbox = request.form.get("gearbox"),
             HorsePower = float(request.form.get("HorsePower")),
             kilometer = float(request.form.get("kilometer")),
+            Seller = request.form.get("Seller"),
+            NotRepairedDamaged = request.form.get("NotRepairedDamaged"),
+            abtest = request.form.get("abtest"),
+            offerType = request.form.get("offerType")
+            
         )
         pred_df = data.get_data_as_data_frame()
         

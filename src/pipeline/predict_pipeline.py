@@ -16,9 +16,9 @@ class PredictPipeline:
 
             model = load_object(file_path = model_path);
             preprocessor = load_object(file_path=preprocessor_path)
+            
             print(features)
-            print("Yes")
-
+            
             data_scaled = preprocessor.transform(features)
             print(data_scaled)
             preds = model.predict(data_scaled)
@@ -29,7 +29,8 @@ class PredictPipeline:
         
     
 class CustomData:
-    def __init__(self, HorsePower: float, kilometer: float, RiskLevel: str, fuelType: str, vehicleType: str, gearbox: str):
+    def __init__(self, HorsePower: float, kilometer: float, RiskLevel: str, fuelType: str, vehicleType: str, gearbox: str,
+                 Seller: str, NotRepairedDamaged: str, abtest: str, offerType: str):
         
         self.HorsePower = HorsePower
         self.kilometer = kilometer
@@ -37,6 +38,11 @@ class CustomData:
         self.fuelType = fuelType
         self.vehicleType = vehicleType
         self.gearbox = gearbox
+        self.Seller = Seller
+        self.NotRepairedDamaged = NotRepairedDamaged
+        self.abtest = abtest
+        self.offerType = offerType
+        
     
     def get_data_as_data_frame(self):
         
@@ -47,7 +53,11 @@ class CustomData:
                 "RiskLevel": [self.RiskLevel],
                 "fuelType": [self.fuelType],
                 "vehicleType": [self.vehicleType],
-                "gearbox": [self.gearbox]
+                "gearbox": [self.gearbox],
+                "Seller": [self.Seller],
+                "NotRepairedDamaged": [self.NotRepairedDamaged],
+                "abtest": [self.abtest],
+                "offerType": [self.offerType]
                 
             }
             return pd.DataFrame(custom_data_input_dict)
