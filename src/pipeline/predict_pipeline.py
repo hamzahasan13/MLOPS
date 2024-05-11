@@ -18,6 +18,7 @@ class PredictPipeline:
             model = load_object(file_path = model_path);
             preprocessor = load_object(file_path=preprocessor_path)
             
+            print(features)
             data_scaled = preprocessor.transform(features)
             preds = np.round(model.predict(data_scaled),2)
 

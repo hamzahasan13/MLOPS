@@ -4,6 +4,7 @@
 /src/logs/
 /artifacts/
 /logs/
+logs/
 notebook/data/cars.csv
 
 ## Ignore Python cache files
