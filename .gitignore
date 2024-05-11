@@ -7,9 +7,13 @@
 logs/
 notebook/data/cars.csv
 
+.pytest_cache/
+
 ## Ignore Python cache files
 __pycache__/
 
 .DS_Store/
 
 google-cloud-sdk
+
+mlruns

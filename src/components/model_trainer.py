@@ -2,6 +2,7 @@ import os
 import sys
 import pandas as pd
 from dataclasses import dataclass
+import mlflow
 
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
@@ -13,7 +14,7 @@ from sklearn.ensemble import (
     RandomForestRegressor,
 )
 from sklearn.linear_model import LinearRegression, ElasticNet
-from sklearn.metrics import r2_score
+from sklearn.metrics import r2_score, root_mean_squared_error, mean_absolute_error
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.model_selection import train_test_split
 
@@ -105,6 +106,8 @@ class ModelTrainer:
             """
             
             model_report:dict=evaluate_models(X_train= X_train, y_train= y_train, X_test= X_test, y_test= y_test, models= models)
+            
+
             
             ## To get best model score from dict
             best_model_score = max(sorted(model_report.values()))
@@ -201,6 +204,22 @@ class ModelTrainer:
             
             Serving_model = best_model.fit(input_feature_train_arr_df, y_train)
             """
+            
+            # Log parameters
+            mlflow.sklearn.log_model(best_model, "best_model")
+
+            # Evaluate best model
+            predicted = best_model.predict(X_test)
+            r2_square = round(r2_score(y_test, predicted), 2)
+            rmse = round(root_mean_squared_error(y_test, predicted), 2)
+            mae = round(mean_absolute_error(y_test, predicted), 2)
+
+            # Log metrics
+            mlflow.log_metric("r2", r2_square)
+            mlflow.log_metric("rmse", rmse)
+            mlflow.log_metric("mae", mae)
+
+            
             
             predicted=best_model.predict(X_test)
             
