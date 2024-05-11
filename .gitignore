@@ -2,7 +2,7 @@
 /MLOps_Project.egg-info/
 /src/components/logs/
 /src/logs/
-/artifacts/
+
 /logs/
 logs/
 notebook/data/cars.csv
