@@ -135,7 +135,7 @@ class DataCleaning:
         
     def clean_data(self, df):
         # Apply multiple cleaning functions sequentially
-        df = self.data_analysis(df)
+        #df = self.data_analysis(df)
         df = self.col_names_replace(df)
         df = self.fill_missing(df)
         df = self.capitalize_letters(df)
@@ -158,7 +158,8 @@ if __name__ == "__main__":
         
         # Clean the data using multiple cleaning functions
         cleaned_df = cleaner.clean_data(df)
-        
+
+        cleaned_df = cleaned_df.sample(n=15000, random_state=42)
         # Specify the path to save the cleaned data
         cleaned_data_path = os.path.join('artifacts', 'cleaned_data.csv')
         os.makedirs(os.path.dirname(cleaned_data_path), exist_ok=True)

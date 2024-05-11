@@ -92,8 +92,11 @@ class DataTransformation:
             + preprocessing_obj.named_transformers_['cat_pipeline'].named_steps['one_hot_encoder'].get_feature_names_out(categorical_columns).tolist()
             )
             
-            dense_input_feature_train_arr = input_feature_train_arr.toarray()
-            dense_input_feature_test_arr = input_feature_test_arr.toarray()
+            #dense_input_feature_train_arr = input_feature_train_arr.toarray()
+            #dense_input_feature_test_arr = input_feature_test_arr.toarray()
+            
+            dense_input_feature_train_arr = input_feature_train_arr
+            dense_input_feature_test_arr = input_feature_test_arr
             
             # Create DataFrame using dense matrix and column names
             input_feature_train_arr = pd.DataFrame(dense_input_feature_train_arr, columns=transformed_columns)
