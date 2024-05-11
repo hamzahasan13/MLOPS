@@ -16,7 +16,6 @@ def index():
     return render_template('index.html')
 
 @app.route('/predictdata', methods = ['GET', 'POST'])
-
 def predict_datapoint():
     if request.method == 'GET':
         return render_template('home.html')
@@ -32,7 +31,6 @@ def predict_datapoint():
             kilometer = float(request.form.get("kilometer")),
             Seller = request.form.get("Seller"),
             NotRepairedDamaged = request.form.get("NotRepairedDamaged"),
-            abtest = request.form.get("abtest"),
             offerType = request.form.get("offerType")
             
         )

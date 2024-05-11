@@ -29,7 +29,7 @@ class PredictPipeline:
     
 class CustomData:
     def __init__(self, HorsePower: float, kilometer: float, RiskLevel: str, fuelType: str, vehicleType: str, gearbox: str,
-                 Seller: str, NotRepairedDamaged: str, abtest: str, offerType: str):
+                 Seller: str, NotRepairedDamaged: str, offerType: str):
         
         self.HorsePower = HorsePower
         self.kilometer = kilometer
@@ -39,7 +39,6 @@ class CustomData:
         self.gearbox = gearbox
         self.Seller = Seller
         self.NotRepairedDamaged = NotRepairedDamaged
-        self.abtest = abtest
         self.offerType = offerType
         
     
@@ -55,7 +54,6 @@ class CustomData:
                 "gearbox": [self.gearbox],
                 "Seller": [self.Seller],
                 "NotRepairedDamaged": [self.NotRepairedDamaged],
-                "abtest": [self.abtest],
                 "offerType": [self.offerType]
                 
             }

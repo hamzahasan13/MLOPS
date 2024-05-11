@@ -207,7 +207,7 @@ class ModelTrainer:
             
             X_orig_selected = X_orig[list(original_columns)]
             
-            r2_square = r2_score(y_test, predicted)
+            r2_square = round(r2_score(y_test, predicted), 2)
             
             save_obj(
                 file_path=self.model_trainer_config.trained_model_file_path,

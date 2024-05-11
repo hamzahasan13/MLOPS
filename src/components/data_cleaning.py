@@ -128,7 +128,7 @@ class DataCleaning:
         This function drops irrelevant columns.
         """
         cols_to_drop = ['index', 'nrOfPictures', 'postalCode', 'dateCrawled', 'name', 'dateCreated', 'lastSeen', 'Registration_Month',
-                        'model', 'brand'];
+                        'model', 'brand', 'abtest'];
         df.drop(cols_to_drop, axis=1, inplace=True);
         
         return (df)

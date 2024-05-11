@@ -10,3 +10,5 @@ notebook/data/cars.csv
 __pycache__/
 
 .DS_Store/
+
+google-cloud-sdk
