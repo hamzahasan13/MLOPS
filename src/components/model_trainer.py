@@ -8,10 +8,13 @@ import mlflow.sklearn
 import mlflow.pyfunc
 from mlflow.tracking import MlflowClient
 from mlflow.utils.environment import _mlflow_conda_env
+from mlflow.tracking import MlflowClient
+from mlflow.entities import ViewType
 import cloudpickle
 from hyperopt import hp
 import numpy as np
 import time
+import pickle
 
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
@@ -136,16 +139,82 @@ class ModelTrainer:
                 raise CustomException("No best model found")
             logging.info(f"Best found model on both training and testing dataset")
             
+            save_obj(
+                file_path=self.model_trainer_config.trained_model_file_path,
+                obj=best_model
+            )
+            
+            #MLFLOW_TRACKING_URI = "sqlite:///mlflow.db"
+
+            
+
+            #for run in runs:
+            #    print(f"run id: {run.info.run_id}, r2: {run.data.metrics['r2']:.4f}")
+
+            ## Interacting with Model Registry
+            
+            #mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+            
+            """
+            loaded_model = pickle.load(open('artifacts/model.pkl', "rb"));
+            
+            mlflow.set_tracking_uri("sqlite:///mlruns.db")
+            reg_model_name = best_model_name
+            print("--")
+            mlflow.sklearn.log_model(
+                loaded_model,
+                "sk_learn",
+                serialization_format="cloudpickle",
+                registered_model_name=reg_model_name,
+            )
+            
+            model_uri = f"models:/{reg_model_name}/1"
+            loaded_model = mlflow.sklearn.load_model(model_uri)
+            print("--")
+            """
+            predictions = best_model.predict(X_test);
+            r2_sq = round(r2_score(y_test, predictions),2)
+            
             # Log parameters
             with mlflow.start_run(run_name = best_model_name):
-                """
+                
                 mlflow.set_tag("Model", best_model_name)
+                # Set the active experiment
+                #mlflow.set_experiment("App")
+
+                # Create an MlflowClient object
+                client = MlflowClient()
+                runs = client.search_runs(
+                        experiment_ids='0',
+                        filter_string="metrics.r2 >0.7",
+                        run_view_type=ViewType.ACTIVE_ONLY,
+                        max_results=5,
+                        order_by=["metrics.r2 DESC"]
+                    )
+                
+                highest_r2 = -float('inf')
+                run_ids_with_highest_r2 = []
+
+                # Loop through the runs and find the highest r2 score
+                for run in runs:
+                    r2_scores = run.data.metrics['r2']
+                    if r2_scores > highest_r2:
+                        highest_r2 = r2_scores
+                        run_ids_with_highest_r2 = [run.info.run_id]
+                    elif r2_scores == highest_r2:
+                        run_ids_with_highest_r2.append(run.info.run_id)
+
+                # Register all models with the highest r2 score
+                for run_id in run_ids_with_highest_r2:
+                    model_uri = f"runs:/{run_id}/model"
+                    mlflow.register_model(model_uri=model_uri, name="Default")
+                
+                """
                 mlflow.sklearn.log_model(
                     sk_model=model,
                     artifact_path="sklearn-model",
                     registered_model_name=best_model_name,
     )
-
                 wrappedModel = SklearnModelWrapper(best_model)
                 conda_env = _mlflow_conda_env(
                     additional_conda_deps=None,
@@ -158,6 +227,12 @@ class ModelTrainer:
                             python_model=wrappedModel,
                             conda_env=conda_env
                             )
+                MLFLOW_TRACKING_URI = "sqlite:///mlflow.db"
+                client = MlflowClient(tracking_uri=MLFLOW_TRACKING_URI)
+
+                print("h1")
+                print(mlflow.list_experiments())
+                print('h2')
                 """
                 # Evaluate best model
                 predicted = best_model.predict(X_test)
@@ -170,7 +245,8 @@ class ModelTrainer:
                 mlflow.log_metric("rmse", rmse)
                 mlflow.log_metric("mae", mae)
                 mlflow.end_run()
-            
+
+
             """
             ##Model Registration in MLflow Model Registry
             run_id = mlflow.search_runs(filter_string=f'tags.mlflow.runName ="{best_model_name}"').iloc[0].run_id
@@ -188,15 +264,16 @@ class ModelTrainer:
             
             model = mlflow.pyfunc.load_model(f"runs:/{run_id}/MLmodel")
 
-
+            
             # Sanity-check: This should match the AUC logged by MLflow
             print(f'R2: {r2_score(y_test, model.predict(X_test))}')
             """
+            
             original_columns = set(feature.split('_', 1)[0] for feature in X_train)
             
             X_orig_selected = X_orig[list(original_columns)]
             
-            r2_square = round(r2_score(y_test, predicted), 2)
+            #r2_square = round(r2_score(y_test, predicted), 2)
             
             ## Hyperparameter Tuning with MLflow
             """
@@ -268,12 +345,8 @@ class ModelTrainer:
                     mlflow.log_params({'learning_rate': learning_rate, 'max_depth': max_depth})
                     mlflow.log_metric("r2", r2_square)
                 """
-                
-            save_obj(
-                file_path=self.model_trainer_config.trained_model_file_path,
-                obj=best_model
-            )
-            return r2_square
+
+            return r2_sq
         
         except Exception as e:
             raise CustomException(e, sys)
