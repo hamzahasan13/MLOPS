@@ -3,7 +3,7 @@ import sys
 import pandas as pd
 from dataclasses import dataclass
 import mlflow
-#import hp
+from hyperopt import hp
 import numpy as np
 
 from sklearn.compose import ColumnTransformer
@@ -118,15 +118,14 @@ class ModelTrainer:
                 list(model_report.values()).index(best_model_score)
             ]
             best_model = models[best_model_name]
-            #print(best_model)
 
             if best_model_score<0.6:
                 raise CustomException("No best model found")
             logging.info(f"Best found model on both training and testing dataset")
             
             # Log parameters
-            mlflow.set_tag("Model", best_model)
-            mlflow.sklearn.log_model(best_model, "best_model")
+            mlflow.set_tag("Model", best_model_name)
+            mlflow.sklearn.log_model(best_model_name, "best_model")
 
             # Evaluate best model
             predicted = best_model.predict(X_test)
@@ -138,6 +137,7 @@ class ModelTrainer:
             mlflow.log_metric("r2", r2_square)
             mlflow.log_metric("rmse", rmse)
             mlflow.log_metric("mae", mae)
+            mlflow.end_run()
 
             predicted=best_model.predict(X_test)
             
@@ -147,36 +147,77 @@ class ModelTrainer:
             
             r2_square = round(r2_score(y_test, predicted), 2)
             
-            print(best_model)
-            
+            ## Hyperparameter Tuning with MLflow
             """
             with mlflow.start_run():
                 mlflow.set_tag("Model", best_model)
                 
-                if best_model == 'Elastic Net()':
+                if best_model_name == 'ElasticNet':
                     search_space = {'alpha': hp.loguniform('alpha', 0.01, 1),
                                     'l1_ratio': hp.loguniform('l1_ratio', 0, 1)}
-                
-                elif best_model == 'Decision Tree Regressor()':
-                    search_space = {'min_samples_split': hp.logunifrom('min_samples_split', 2, 10),
-                                    'min_samples_leaf': hp.loguniform('min_samples_leaf', 1, 4)}
-                
-                elif best_model == 'RandomForestRegressor()':
-                    search_space = {'n_estimators': hp.logunifrom('n_estimators', 10, 200),
-                                    'max_depth': hp.loguniform('max_depth', 10, 50)}
-                
-                elif best_model == 'GradientBoostingRegressor()':
-                    search_space = {'learning_rate': hp.logunifrom('learning_rate', 0.001, 0.1),
-                                    'max_depth': hp.loguniform('max_depth', 3, 6)}
                     
-                mlflow.log_params(search_space)
-                ml_model = best_model(**search_space).fit(X_train, y_train);
-                pred = ml_model.predict(X_test)
+                    mlflow.set_tag("model", 'ElasticNet')
+                    for alpha in search_space['alpha']:
+                        for l1_ratio in search_space['l1_ratio']:
+                            ml_model = ElasticNet(alpha=alpha, l1_ratio=l1_ratio).fit(X_train, y_train)
+                            pred = ml_model.predict(X_test)
+                            r2_sq = r2_score(pred, y_test)
+                            
+                            print("alpha:", alpha, "l1_ratio:", l1_ratio, "R2 Score:", r2_sq)
+                            
+                    mlflow.log_params({'n_estimators': n_estimators, 'max_depth': max_depth})
+                    mlflow.log_metric("r2", r2_square)
+
                 
-                r2_sq = r2_score(pred, y_test)
-                print(r2_sq)
-            """
-            
+                elif best_model_name == 'DecisionTreeRegressor':
+                    search_space = {'min_samples_split': hp.loguniform('min_samples_split', 2, 10),
+                                    'min_samples_leaf': hp.loguniform('min_samples_leaf', 1, 4)}
+                    
+                    mlflow.set_tag("model", 'DecisionTreeRegressor')
+                    for min_samples_split in search_space['min_samples_split']:
+                        for min_samples_leaf in search_space['min_samples_leaf']:
+                            ml_model = DecisionTreeRegressor(min_samples_split=min_samples_split, min_samples_leaf=min_samples_leaf).fit(X_train, y_train)
+                            pred = ml_model.predict(X_test)
+                            r2_sq = r2_score(pred, y_test)
+                            
+                            print("min_samples_split:", min_samples_split, "min_samples_leaf:", min_samples_leaf, "R2 Score:", r2_sq)
+                            
+                    mlflow.log_params({'n_estimators': n_estimators, 'max_depth': max_depth})
+                    mlflow.log_metric("r2", r2_square)
+
+                elif best_model_name == 'RandomForestRegressor':
+                    search_space = {'n_estimators': hp.loguniform('n_estimators', 10, 200),
+                                    'max_depth': hp.loguniform('max_depth', 10, 50)}
+                    
+                    mlflow.set_tag("model", 'RandomForestRegressor')
+                    for n_estimators in search_space['n_estimators']:
+                        for max_depth in search_space['max_depth']:
+                            ml_model = RandomForestRegressor(n_estimators=n_estimators, max_depth=max_depth).fit(X_train, y_train)
+                            pred = ml_model.predict(X_test)
+                            r2_sq = r2_score(pred, y_test)
+                            
+                            print("n_estimators:", n_estimators, "Max Depth:", max_depth, "R2 Score:", r2_sq)
+                            
+                    mlflow.log_params({'n_estimators': n_estimators, 'max_depth': max_depth})
+                    mlflow.log_metric("r2", r2_square)
+
+                elif best_model_name == 'GradientBoostingRegressor':
+                    search_space = {'learning_rate': [0.001, 0.01, 0.1],
+                                    'max_depth': [3, 4, 5, 6]}
+                    
+                    mlflow.set_tag("model", 'GradientBoostingRegressor')
+                    for learning_rate in search_space['learning_rate']:
+                        for max_depth in search_space['max_depth']:
+                            ml_model = GradientBoostingRegressor(learning_rate=learning_rate, max_depth=max_depth).fit(X_train, y_train)
+                            pred = ml_model.predict(X_test)
+                            r2_sq = r2_score(pred, y_test)
+                            
+                            print("Learning Rate:", learning_rate, "Max Depth:", max_depth, "R2 Score:", r2_sq)
+                            
+                    mlflow.log_params({'learning_rate': learning_rate, 'max_depth': max_depth})
+                    mlflow.log_metric("r2", r2_square)
+                """
+                
             save_obj(
                 file_path=self.model_trainer_config.trained_model_file_path,
                 obj=best_model
