@@ -12,4 +12,5 @@ Flask
 pytest
 mlflow
 hyperopt
+hp
 -e .

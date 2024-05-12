@@ -3,6 +3,7 @@ import sys
 import pandas as pd
 from dataclasses import dataclass
 import mlflow
+#import hp
 import numpy as np
 
 from sklearn.compose import ColumnTransformer
@@ -107,9 +108,7 @@ class ModelTrainer:
             """
             
             model_report:dict=evaluate_models(X_train= X_train, y_train= y_train, X_test= X_test, y_test= y_test, models= models)
-            
-
-            
+        
             ## To get best model score from dict
             best_model_score = max(sorted(model_report.values()))
 
@@ -125,88 +124,8 @@ class ModelTrainer:
                 raise CustomException("No best model found")
             logging.info(f"Best found model on both training and testing dataset")
             
-            """
-            feature_importances = best_model.feature_importances_
-            feature_importance_df = pd.DataFrame({'Feature': X_train.columns, 'Importance': feature_importances})
-
-            # Sorting features by importance
-            feature_importance_df = feature_importance_df.sort_values(by='Importance', ascending=False)
-
-            threshold = 0.01
-
-            # Selecting features above the threshold
-            selected_features = feature_importance_df[feature_importance_df['Importance'] >= threshold]['Feature'].tolist()
-            
-            original_columns = set(feature.split('_', 1)[0] for feature in selected_features)
-            
-            X_orig_selected = X_orig[list(original_columns)]
-            
-            numeric_columns = X_orig_selected.select_dtypes(include=['number']).columns
-            categorical_columns = X_orig_selected.select_dtypes(include=['object', 'category']).columns
-            
-            num_pipeline = Pipeline(
-                steps = [
-                    ('imputer', SimpleImputer(strategy='median')),
-                     ('scaler', StandardScaler())
-                ]
-            )
-            
-            cat_pipeline = Pipeline(
-                steps = [
-                    ('imputer', SimpleImputer(strategy='most_frequent')),
-                    ('one_hot_encoder', OneHotEncoder()),
-                    ('scaler', StandardScaler(with_mean=False))
-                ]
-            )
-            logging.info("Preprocessing Serving Request Data");
-            
-            preprocessor_selected = ColumnTransformer(
-                [
-                    ("num_pipeline", num_pipeline, numeric_columns),
-                    ('cat_pipeline', cat_pipeline, categorical_columns)
-                ]
-            )
-            
-            train_set, test_set = train_test_split(X_orig_selected, test_size=0.2, random_state=42)
-            
-            logging.info("Applying preprocessing object on feature selected training df and testing df.")
-
-            input_feature_train_arr=preprocessor_selected.fit_transform(train_set)
-            input_feature_test_arr=preprocessor_selected.transform(test_set)
-            
-            transformed_columns = (
-            preprocessor_selected.named_transformers_['num_pipeline'].named_steps['scaler'].get_feature_names_out(numeric_columns).tolist()
-            + preprocessor_selected.named_transformers_['cat_pipeline'].named_steps['one_hot_encoder'].get_feature_names_out(categorical_columns).tolist()
-            )
-            
-            dense_input_feature_train_arr = input_feature_train_arr.toarray()
-            dense_input_feature_test_arr = input_feature_test_arr.toarray()
-            
-            # Create DataFrame using dense matrix and column names
-            input_feature_train_arr_df = pd.DataFrame(dense_input_feature_train_arr, columns=transformed_columns)
-            input_feature_test_arr_df = pd.DataFrame(dense_input_feature_test_arr, columns=transformed_columns)
-            
-            
-            # Specify the path to save the cleaned data
-            final_X_train_path = os.path.join('artifacts', 'final_X_train.csv')
-            final_X_test_path = os.path.join('artifacts', 'final_X_test.csv')
-            os.makedirs(os.path.dirname(final_X_train_path), exist_ok=True)
-            os.makedirs(os.path.dirname(final_X_test_path), exist_ok=True)
-            
-            # Save cleaned data to a new CSV file in the artifacts folder
-            train_set.to_csv(final_X_train_path, index=False)
-            test_set.to_csv(final_X_test_path, index=False)
-            
-            
-            save_obj(
-                file_path = self.data_transformation_config.preprocessor_obj_file_path,
-                obj = preprocessor_selected
-            )
-            
-            Serving_model = best_model.fit(input_feature_train_arr_df, y_train)
-            """
-            
             # Log parameters
+            mlflow.set_tag("Model", best_model)
             mlflow.sklearn.log_model(best_model, "best_model")
 
             # Evaluate best model
@@ -220,8 +139,6 @@ class ModelTrainer:
             mlflow.log_metric("rmse", rmse)
             mlflow.log_metric("mae", mae)
 
-            
-            
             predicted=best_model.predict(X_test)
             
             original_columns = set(feature.split('_', 1)[0] for feature in X_train)
@@ -230,13 +147,43 @@ class ModelTrainer:
             
             r2_square = round(r2_score(y_test, predicted), 2)
             
+            print(best_model)
+            
+            """
+            with mlflow.start_run():
+                mlflow.set_tag("Model", best_model)
+                
+                if best_model == 'Elastic Net()':
+                    search_space = {'alpha': hp.loguniform('alpha', 0.01, 1),
+                                    'l1_ratio': hp.loguniform('l1_ratio', 0, 1)}
+                
+                elif best_model == 'Decision Tree Regressor()':
+                    search_space = {'min_samples_split': hp.logunifrom('min_samples_split', 2, 10),
+                                    'min_samples_leaf': hp.loguniform('min_samples_leaf', 1, 4)}
+                
+                elif best_model == 'RandomForestRegressor()':
+                    search_space = {'n_estimators': hp.logunifrom('n_estimators', 10, 200),
+                                    'max_depth': hp.loguniform('max_depth', 10, 50)}
+                
+                elif best_model == 'GradientBoostingRegressor()':
+                    search_space = {'learning_rate': hp.logunifrom('learning_rate', 0.001, 0.1),
+                                    'max_depth': hp.loguniform('max_depth', 3, 6)}
+                    
+                mlflow.log_params(search_space)
+                ml_model = best_model(**search_space).fit(X_train, y_train);
+                pred = ml_model.predict(X_test)
+                
+                r2_sq = r2_score(pred, y_test)
+                print(r2_sq)
+            """
+            
             save_obj(
                 file_path=self.model_trainer_config.trained_model_file_path,
                 obj=best_model
             )
-            
             return r2_square
-            
+        
         except Exception as e:
             raise CustomException(e, sys)
-
+        
+            
