@@ -2,9 +2,16 @@ import os
 import sys
 import pandas as pd
 from dataclasses import dataclass
+import sklearn
 import mlflow
+import mlflow.sklearn
+import mlflow.pyfunc
+from mlflow.tracking import MlflowClient
+from mlflow.utils.environment import _mlflow_conda_env
+import cloudpickle
 from hyperopt import hp
 import numpy as np
+import time
 
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
@@ -26,7 +33,13 @@ from src.logger import logging
 from src.utils import save_obj, evaluate_models
 from src.components.data_transformation import DataTransformationConfig
 
+
+class SklearnModelWrapper(mlflow.pyfunc.PythonModel):
+    def __init__(self, model):
+        self.model = model
     
+    def predict(self, context, model_input):
+        return self.model.predict(model_input)
 @dataclass
 class ModelTrainerConfig:
     trained_model_file_path=os.path.join("artifacts", "model.pkl")
@@ -124,23 +137,61 @@ class ModelTrainer:
             logging.info(f"Best found model on both training and testing dataset")
             
             # Log parameters
-            mlflow.set_tag("Model", best_model_name)
-            mlflow.sklearn.log_model(best_model_name, "best_model")
+            with mlflow.start_run(run_name = best_model_name):
+                """
+                mlflow.set_tag("Model", best_model_name)
+                mlflow.sklearn.log_model(
+                    sk_model=model,
+                    artifact_path="sklearn-model",
+                    registered_model_name=best_model_name,
+    )
 
-            # Evaluate best model
-            predicted = best_model.predict(X_test)
-            r2_square = round(r2_score(y_test, predicted), 2)
-            rmse = round(np.sqrt(mean_squared_error(y_test, predicted)), 2)
-            mae = round(mean_absolute_error(y_test, predicted), 2)
+                wrappedModel = SklearnModelWrapper(best_model)
+                conda_env = _mlflow_conda_env(
+                    additional_conda_deps=None,
+                    additional_pip_deps=["cloudpickle=={}".format(cloudpickle.__version__), "scikit-learn=={}".format(sklearn.__version__)],
+                    additional_conda_channels=None,
+                )
+                
+                
+                mlflow.pyfunc.log_model(best_model_name,
+                            python_model=wrappedModel,
+                            conda_env=conda_env
+                            )
+                """
+                # Evaluate best model
+                predicted = best_model.predict(X_test)
+                r2_square = round(r2_score(y_test, predicted), 2)
+                rmse = round(np.sqrt(mean_squared_error(y_test, predicted)), 2)
+                mae = round(mean_absolute_error(y_test, predicted), 2)
 
-            # Log metrics
-            mlflow.log_metric("r2", r2_square)
-            mlflow.log_metric("rmse", rmse)
-            mlflow.log_metric("mae", mae)
-            mlflow.end_run()
-
-            predicted=best_model.predict(X_test)
+                # Log metrics
+                mlflow.log_metric("r2", r2_square)
+                mlflow.log_metric("rmse", rmse)
+                mlflow.log_metric("mae", mae)
+                mlflow.end_run()
             
+            """
+            ##Model Registration in MLflow Model Registry
+            run_id = mlflow.search_runs(filter_string=f'tags.mlflow.runName ="{best_model_name}"').iloc[0].run_id
+            model_name = best_model_name
+            model_version = mlflow.register_model(f"runs:/{run_id}/MLmodel", best_model_name)
+            # Registering the model takes a few seconds, so add a small delay
+            time.sleep(15)
+
+            client = MlflowClient()
+            client.transition_model_version_stage(
+            name=model_name,
+            version=model_version.version,
+            stage="Production",
+            )           
+            
+            model = mlflow.pyfunc.load_model(f"runs:/{run_id}/MLmodel")
+
+
+            # Sanity-check: This should match the AUC logged by MLflow
+            print(f'R2: {r2_score(y_test, model.predict(X_test))}')
+            """
             original_columns = set(feature.split('_', 1)[0] for feature in X_train)
             
             X_orig_selected = X_orig[list(original_columns)]
