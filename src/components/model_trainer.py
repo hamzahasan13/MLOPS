@@ -147,22 +147,26 @@ class ModelTrainer:
             predictions = best_model.predict(X_test);
             r2_sq = round(r2_score(y_test, predictions),2)
             
+            
             # Log parameters
-            with mlflow.start_run(run_name = best_model_name):
+            with mlflow.start_run(): #run_name = best_model_name)
                 
-                #mlflow.set_tag("Model", best_model_name)
+                mlflow.autolog()
                 
-                wrappedModel = SklearnModelWrapper(best_model)
-                conda_env =  _mlflow_conda_env(
-                        additional_conda_deps=None,
-                        additional_pip_deps=["cloudpickle=={}".format(cloudpickle.__version__), "scikit-learn=={}".format(sklearn.__version__)],
-                        additional_conda_channels=None,
-                    )
-                mlflow.pyfunc.log_model(best_model_name,
-                                        python_model=wrappedModel,
-                                        conda_env=conda_env
-                                        )
-
+                
+                # Evaluate best model
+                predicted = best_model.predict(X_test)
+                r2_square = round(r2_score(y_test, predicted), 2)
+                rmse = round(np.sqrt(mean_squared_error(y_test, predicted)), 2)
+                mae = round(mean_absolute_error(y_test, predicted), 2)
+                
+                # Log metrics
+                mlflow.log_metric("r2", r2_square)
+                mlflow.log_metric("rmse", rmse)
+                mlflow.log_metric("mae", mae)
+                
+                mlflow.sklearn.log_model(best_model, "model")
+                
                 # Create an MlflowClient object
                 client = MlflowClient()
                 runs = client.search_runs(
@@ -185,57 +189,46 @@ class ModelTrainer:
                     elif r2_scores == highest_r2:
                         run_ids_with_highest_r2.append(run.info.run_id)
                         
-                        
-
-                """
-                # Register all models with the highest r2 score
-                for run_id in run_ids_with_highest_r2:
-                    model_uri = f"runs:/{run_id}/{best_model_name}"
-                    print(model_uri)
-                    mlflow.register_model(model_uri=model_uri, name=best_model_name)
-                """
-                # Evaluate best model
-                predicted = best_model.predict(X_test)
-                r2_square = round(r2_score(y_test, predicted), 2)
-                rmse = round(np.sqrt(mean_squared_error(y_test, predicted)), 2)
-                mae = round(mean_absolute_error(y_test, predicted), 2)
-
-                # Log metrics
-                mlflow.log_metric("r2", r2_square)
-                mlflow.log_metric("rmse", rmse)
-                mlflow.log_metric("mae", mae)
-                mlflow.end_run()
             
-            """
+                
+                
+                mlflow.end_run()
+                
+                
+            print('h1')
+            print(run_ids_with_highest_r2)
+            print('h1')
+            # Register all models with the highest r2 score
+            if run_ids_with_highest_r2:
+                for run_id in run_ids_with_highest_r2:
+                    model_uri = f"runs:/{run_id}/'model'"
+                    print(model_uri)
+                    model_version = mlflow.register_model(model_uri=model_uri, name=best_model_name)
+            
+            #model = mlflow.sklearn.load_model(f"mlruns/0/{run_id}/artifacts/model/")  
+            """"""
+            print('h2')
             latest_versions = client.get_latest_versions(name = best_model_name)
             print(latest_versions)
+            print('h2')
             
             for version in latest_versions:
                 print(f"version: {version.version}, stage: {version.current_stage}")
-            """
             
-            model_version = 1
-            new_stage = "Production"
+            
+            client = MlflowClient()
             client.transition_model_version_stage(
-                name=best_model_name,
-                version=model_version,
-                stage=new_stage,
-                archive_existing_versions=True
+            name=best_model_name,
+            version=model_version.version,
+            stage="Production",
             )
             
-            #latest_versions = client.get_latest_versions(name=best_model_name)
-
-            #for version in latest_versions:
-            #    print(f"version: {version.version}, stage: {version.current_stage}")
-            
-            #model = mlflow.pyfunc.load_model(f"models:/{best_model_name}/production")
-            #print(model)
-            
+            """
             #original_columns = set(feature.split('_', 1)[0] for feature in X_train)
             #X_orig_selected = X_orig[list(original_columns)]
             
             ## Hyperparameter Tuning with MLflow
-            """
+            
             with mlflow.start_run():
                 mlflow.set_tag("Model", best_model)
                 

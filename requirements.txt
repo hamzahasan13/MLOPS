@@ -11,6 +11,4 @@ dill
 Flask
 pytest
 mlflow
-hyperopt
-hp
 -e .
