@@ -9,6 +9,8 @@ from mlflow.tracking import MlflowClient
 from mlflow.tracking import MlflowClient
 from mlflow.entities import ViewType
 import numpy as np
+import requests
+import json
 
 
 from sklearn.compose import ColumnTransformer
@@ -212,8 +214,9 @@ class ModelTrainer:
                 print("No model version found with R2 score greater than 0.7.")
             
             model = mlflow.pyfunc.load_model(f"models:/{model_name}/{'Production'}/model")
-            pred = model.predict(X_test);
-            r2_sq_new = round(r2_score(y_test, pred), 2)
+            #pred = model.predict(X_test);
+            #r2_sq_new = round(r2_score(y_test, pred), 2)
+            
                 
             """    
             # Register all models with the highest r2 score
