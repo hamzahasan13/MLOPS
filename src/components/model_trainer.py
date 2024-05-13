@@ -2,19 +2,14 @@ import os
 import sys
 import pandas as pd
 from dataclasses import dataclass
-import sklearn
 import mlflow
 import mlflow.sklearn
 import mlflow.pyfunc
 from mlflow.tracking import MlflowClient
-from mlflow.utils.environment import _mlflow_conda_env
 from mlflow.tracking import MlflowClient
 from mlflow.entities import ViewType
-import cloudpickle
-from hyperopt import hp
 import numpy as np
-import time
-import pickle
+
 
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
@@ -189,8 +184,6 @@ class ModelTrainer:
                     elif r2_scores == highest_r2:
                         run_ids_with_highest_r2.append(run.info.run_id)
                         
-            
-                
                 
                 mlflow.end_run()
                 
@@ -212,9 +205,10 @@ class ModelTrainer:
             print(latest_versions)
             print('h2')
             
+            print('h3')
             for version in latest_versions:
                 print(f"version: {version.version}, stage: {version.current_stage}")
-            
+            print('h3')
             
             client = MlflowClient()
             client.transition_model_version_stage(
@@ -223,6 +217,8 @@ class ModelTrainer:
             stage="Production",
             )
             
+            for version in latest_versions:
+                print(f"version: {version.version}, stage: {version.current_stage}")
             """
             #original_columns = set(feature.split('_', 1)[0] for feature in X_train)
             #X_orig_selected = X_orig[list(original_columns)]
