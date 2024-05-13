@@ -148,7 +148,6 @@ class ModelTrainer:
                 
                 mlflow.autolog()
                 
-                
                 # Evaluate best model
                 predicted = best_model.predict(X_test)
                 r2_square = round(r2_score(y_test, predicted), 2)
@@ -174,6 +173,7 @@ class ModelTrainer:
                 
                 highest_r2 = -float('inf')
                 run_ids_with_highest_r2 = []
+                best_model_version = None
 
                 # Loop through the runs and find the highest r2 score
                 for run in runs:
@@ -181,16 +181,41 @@ class ModelTrainer:
                     if r2_scores > highest_r2:
                         highest_r2 = r2_scores
                         run_ids_with_highest_r2 = [run.info.run_id]
+                        best_model_version = run.info.run_id
                     elif r2_scores == highest_r2:
                         run_ids_with_highest_r2.append(run.info.run_id)
                         
                 
                 mlflow.end_run()
+            
+            if best_model_version:
+                best_run = client.get_run(best_model_version)
+                model_name = best_model_name
+                try:
+                    model = client.get_registered_model(model_name)
+                except Exception:
+                    model = client.create_registered_model(model_name)
                 
+                model_version = client.create_model_version(
+                    name = model_name,
+                    source = best_run.info.artifact_uri,
+                    run_id= best_model_version,
+                )
                 
-            print('h1')
-            print(run_ids_with_highest_r2)
-            print('h1')
+                client.transition_model_version_stage(
+                    name=model_name,
+                    version=model_version.version,
+                    stage="Production"
+                )
+                print(f"Model version {model_version.version} with highest R2 score {highest_r2} set to Production stage.")
+            else:
+                print("No model version found with R2 score greater than 0.7.")
+            
+            model = mlflow.pyfunc.load_model(f"models:/{model_name}/{'Production'}/model")
+            pred = model.predict(X_test);
+            r2_sq_new = round(r2_score(y_test, pred), 2)
+                
+            """    
             # Register all models with the highest r2 score
             if run_ids_with_highest_r2:
                 for run_id in run_ids_with_highest_r2:
@@ -199,27 +224,39 @@ class ModelTrainer:
                     model_version = mlflow.register_model(model_uri=model_uri, name=best_model_name)
             
             #model = mlflow.sklearn.load_model(f"mlruns/0/{run_id}/artifacts/model/")  
-            """"""
-            print('h2')
-            latest_versions = client.get_latest_versions(name = best_model_name)
-            print(latest_versions)
-            print('h2')
+
+            #latest_versions = client.get_latest_versions(name = best_model_name)
+            
+            latest_mv = client.get_latest_versions(best_model_name, stages = ['Production'])
             
             print('h3')
-            for version in latest_versions:
+            for version in latest_mv:
                 print(f"version: {version.version}, stage: {version.current_stage}")
             print('h3')
+
+            client.set_registered_model_alias(best_model_name, "Champion", model_version.version)
             
-            client = MlflowClient()
+            
             client.transition_model_version_stage(
             name=best_model_name,
             version=model_version.version,
             stage="Production",
             )
             
+            print('h4')
+            latest_versions = client.get_latest_versions(name = best_model_name)
             for version in latest_versions:
                 print(f"version: {version.version}, stage: {version.current_stage}")
-            """
+            print('h4')
+
+            client = MlflowClient()
+            client.transition_model_version_stage(
+            name=best_model_name,
+            version=model_version.version,
+            stage="Production",
+            )
+
+            
             #original_columns = set(feature.split('_', 1)[0] for feature in X_train)
             #X_orig_selected = X_orig[list(original_columns)]
             
