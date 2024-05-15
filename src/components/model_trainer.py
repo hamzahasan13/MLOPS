@@ -9,9 +9,6 @@ from mlflow.tracking import MlflowClient
 from mlflow.tracking import MlflowClient
 from mlflow.entities import ViewType
 import numpy as np
-import requests
-import json
-
 
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
@@ -63,8 +60,7 @@ class ModelTrainer:
                 test_array.iloc[:, -1]
             )
             
-            
-            X_orig = pd.concat([input_feature_train_df, input_feature_test_df]).reset_index(drop=True)
+            #X_orig = pd.concat([input_feature_train_df, input_feature_test_df]).reset_index(drop=True)
             
             models = {
                 'Linear Regression': LinearRegression(),
@@ -126,7 +122,6 @@ class ModelTrainer:
             best_model_score = max(sorted(model_report.values()))
 
             ## To get best model name from dict
-
             best_model_name = list(model_report.keys())[
                 list(model_report.values()).index(best_model_score)
             ]
@@ -143,7 +138,6 @@ class ModelTrainer:
 
             predictions = best_model.predict(X_test);
             r2_sq = round(r2_score(y_test, predictions),2)
-            
             
             # Log parameters
             with mlflow.start_run(): #run_name = best_model_name)
@@ -213,6 +207,8 @@ class ModelTrainer:
             else:
                 print("No model version found with R2 score greater than 0.7.")
             
+            
+            ## Loads the model in production stage and then makes prediction
             model = mlflow.pyfunc.load_model(f"models:/{model_name}/{'Production'}/model")
             #pred = model.predict(X_test);
             #r2_sq_new = round(r2_score(y_test, pred), 2)
@@ -226,10 +222,10 @@ class ModelTrainer:
                     print(model_uri)
                     model_version = mlflow.register_model(model_uri=model_uri, name=best_model_name)
             
+            ## This loads the model stored in the mlruns directory
             #model = mlflow.sklearn.load_model(f"mlruns/0/{run_id}/artifacts/model/")  
 
             #latest_versions = client.get_latest_versions(name = best_model_name)
-            
             latest_mv = client.get_latest_versions(best_model_name, stages = ['Production'])
             
             print('h3')
@@ -238,27 +234,6 @@ class ModelTrainer:
             print('h3')
 
             client.set_registered_model_alias(best_model_name, "Champion", model_version.version)
-            
-            
-            client.transition_model_version_stage(
-            name=best_model_name,
-            version=model_version.version,
-            stage="Production",
-            )
-            
-            print('h4')
-            latest_versions = client.get_latest_versions(name = best_model_name)
-            for version in latest_versions:
-                print(f"version: {version.version}, stage: {version.current_stage}")
-            print('h4')
-
-            client = MlflowClient()
-            client.transition_model_version_stage(
-            name=best_model_name,
-            version=model_version.version,
-            stage="Production",
-            )
-
             
             #original_columns = set(feature.split('_', 1)[0] for feature in X_train)
             #X_orig_selected = X_orig[list(original_columns)]
