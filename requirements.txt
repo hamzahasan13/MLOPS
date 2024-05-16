@@ -11,4 +11,5 @@ dill
 Flask
 pytest
 mlflow
--e .
+pendulum
+#-e .
