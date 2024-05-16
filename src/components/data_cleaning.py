@@ -164,39 +164,3 @@ class DataCleaning:
     
         except CustomException as e:
             print(e, sys)
-        
-"""
-if __name__ == "__main__":
-    try:
-        logging.info("Entered the data cleaning process")
-        
-        # Load data
-        data_path = 'notebook/data/data.csv'
-        df = pd.read_csv(data_path)
-        logging.info('Read the data into dataframe')
-        
-        # Initialize DataCleaning object
-        cleaner = DataCleaning()
-        
-        # Clean the data using multiple cleaning functions
-        cleaned_df = cleaner.clean_data(df)
-
-        cleaned_df = cleaned_df.sample(n=15300, random_state=42)
-        # Specify the path to save the cleaned data
-        cleaned_data_path = os.path.join('artifacts', 'cleaned_data.csv')
-        os.makedirs(os.path.dirname(cleaned_data_path), exist_ok=True)
-        
-        # Save cleaned data to a new CSV file in the artifacts folder
-        cleaned_df.to_csv(cleaned_data_path, index=False)
-        #data_path = 'artifacts/cleaned_data.csv'
-        
-        cleaner.initialize_dvc()
-        cleaner.run_dvc_command(f"{data_path}")
-        cleaner.run_dvc_command(f"{cleaned_data_path}")
-        
-        logging.info('Data cleaning process completed')
-        
-    except Exception as e:
-        raise CustomException(e, sys)
-        
-"""
