@@ -3,6 +3,8 @@ from dataclasses import dataclass
 
 import numpy as np 
 import pandas as pd
+#from src.components.data_ingestion import DataIngestion
+
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
@@ -111,7 +113,7 @@ class DataTransformation:
                 file_path = self.data_transformation_config.preprocessor_obj_file_path,
                 obj = preprocessing_obj
             )
-
+            
             return(train_arr, test_arr, self.data_transformation_config.preprocessor_obj_file_path, input_feature_train_df, input_feature_test_df)
             
         except Exception as e:

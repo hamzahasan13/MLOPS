@@ -4,6 +4,7 @@ import os
 import sys
 from src.exception import CustomException
 from src.logger import logging
+import subprocess
 
 class DataCleaning:
     def __init__(self):
@@ -145,12 +146,33 @@ class DataCleaning:
         
         return df
     
+    def initialize_dvc(self):
+        if not os.path.exists(".dvc"):
+            try:
+                
+                subprocess.run(['dvc', 'init'])
+                print("DVC initialized successfully.")
+            except CustomException as e:
+                print(e, sys)
+                
+        else:
+            print(".dvc already exists. DVC Init is skipped.")
+    
+    def run_dvc_command(self, command):
+        try:
+            subprocess.run(f"dvc add {command}", shell=True, check=True)
+    
+        except CustomException as e:
+            print(e, sys)
+        
+"""
 if __name__ == "__main__":
     try:
         logging.info("Entered the data cleaning process")
         
         # Load data
-        df = pd.read_csv('notebook/data/data.csv')
+        data_path = 'notebook/data/data.csv'
+        df = pd.read_csv(data_path)
         logging.info('Read the data into dataframe')
         
         # Initialize DataCleaning object
@@ -166,8 +188,15 @@ if __name__ == "__main__":
         
         # Save cleaned data to a new CSV file in the artifacts folder
         cleaned_df.to_csv(cleaned_data_path, index=False)
+        #data_path = 'artifacts/cleaned_data.csv'
+        
+        cleaner.initialize_dvc()
+        cleaner.run_dvc_command(f"{data_path}")
+        cleaner.run_dvc_command(f"{cleaned_data_path}")
         
         logging.info('Data cleaning process completed')
         
     except Exception as e:
         raise CustomException(e, sys)
+        
+"""
