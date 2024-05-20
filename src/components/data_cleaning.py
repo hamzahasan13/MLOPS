@@ -145,7 +145,7 @@ class DataCleaning:
         df = self.drop_cols(df)
         
         return df
-    
+    """
     def initialize_dvc(self):
         if not os.path.exists(".dvc"):
             try:
@@ -164,3 +164,4 @@ class DataCleaning:
     
         except CustomException as e:
             print(e, sys)
+    """

@@ -12,4 +12,5 @@ Flask
 pytest
 mlflow
 pendulum
+dvc
 #-e .

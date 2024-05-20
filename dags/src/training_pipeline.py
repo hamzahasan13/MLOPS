@@ -33,10 +33,11 @@ class TrainPipeline:
             # Save cleaned data to a new CSV file in the artifacts folder
             cleaned_df.to_csv(cleaned_data_path, index=False)
             #data_path = 'artifacts/cleaned_data.csv'
-            
-            #dc_obj.initialize_dvc()
-            #dc_obj.run_dvc_command(f"{data_path}")
-            #dc_obj.run_dvc_command(f"{cleaned_data_path}")
+            """
+            dc_obj.initialize_dvc()
+            dc_obj.run_dvc_command(f"{data_path}")
+            dc_obj.run_dvc_command(f"{cleaned_data_path}")
+            """
     
             logging.info('Data cleaning process completed')
             

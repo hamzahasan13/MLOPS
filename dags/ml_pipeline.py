@@ -2,21 +2,16 @@ from __future__ import annotations
 import json
 import os
 import sys
+import subprocess
 
 from textwrap import dedent
 import pendulum
 import pandas as pd
 from airflow import DAG
 from airflow.operators.python import PythonOperator
+from airflow.operators.bash import BashOperator
 
-from src.data_cleaning import DataCleaning
-from src.data_ingestion import DataIngestion
-from src.data_transformation import DataTransformation
-from src.model_trainer import ModelTrainer
-from src.logger import logging
-from src.exception import CustomException
 from src.training_pipeline import TrainPipeline
-
 
 ## Pipeline object
 tp_obj = TrainPipeline()
@@ -32,6 +27,21 @@ with DAG(
     
 ) as dag:
     dag.doc_md = __doc__
+    
+    def initialize_dvc_command():
+        return '''
+        if [ ! -d .dvc ]; then
+            dvc init
+            echo "DVC initialized successfully."
+        else
+            echo ".dvc already exists. DVC Init is skipped."
+        fi
+        '''
+    
+    initialize_dvc_task = BashOperator(
+        task_id='initialize_dvc',
+        bash_command=initialize_dvc_command()
+    )
     
     def data_cleaning(**kwargs):
         ## Task Instance
@@ -99,4 +109,4 @@ with DAG(
         """
     )
     
-data_cleaning_task >> data_ingestion_task >> data_transformation_task >> model_trainer_task
+initialize_dvc_task >> data_cleaning_task >> data_ingestion_task >> data_transformation_task >> model_trainer_task

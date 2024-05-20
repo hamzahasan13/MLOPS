@@ -5,7 +5,9 @@
 
 /logs/
 logs/
-notebook/data/cars.csv
+
+data.csv/
+./dags/data_files/data.csv/
 
 .pytest_cache/
 
