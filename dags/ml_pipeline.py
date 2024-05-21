@@ -27,20 +27,45 @@ with DAG(
     
 ) as dag:
     dag.doc_md = __doc__
-    
-    def initialize_dvc_command():
-        return '''
+    """
+    def initialize_and_push_dvc():
+        bash_command = 
         if [ ! -d .dvc ]; then
-            dvc init
+            dvc init && dvc add artifacts/cleaned_data.csv artifacts/data.csv artifacts/train.csv artifacts/test.csv && dvc push
             echo "DVC initialized successfully."
         else
             echo ".dvc already exists. DVC Init is skipped."
         fi
-        '''
+        
+        return bash_command
+
+    dvc_task = BashOperator(
+        task_id='initialize_and_push_dvc',
+        bash_command=initialize_and_push_dvc(),
+    )
+    """
     
-    initialize_dvc_task = BashOperator(
-        task_id='initialize_dvc',
-        bash_command=initialize_dvc_command()
+    def initialize_and_push_dvc(gcs_bucket_name, gcs_credentials_path):
+        bash_command = f"""
+        if [ ! -d .dvc ]; then
+            dvc init -f && \
+            dvc remote add -d myremote4 gs://{gcs_bucket_name} && \
+            dvc remote modify myremote4 gcs_credentials_file {gcs_credentials_path} && \
+            dvc add artifacts/cleaned_data.csv artifacts/data.csv artifacts/train.csv artifacts/test.csv && \
+            dvc push
+            echo "DVC initialized successfully and pushed to GCS bucket."
+        else
+            echo ".dvc already exists. DVC Init is skipped."
+        fi
+        """
+        return bash_command
+
+    gcs_bucket_name = 'price-bucket'
+    gcs_credentials_path = 'mlops-423001-ca5c576a17f8.json'
+
+    dvc_task = BashOperator(
+        task_id='initialize_and_push_dvc',
+        bash_command=initialize_and_push_dvc(gcs_bucket_name, gcs_credentials_path),
     )
     
     def data_cleaning(**kwargs):
@@ -109,4 +134,6 @@ with DAG(
         """
     )
     
-initialize_dvc_task >> data_cleaning_task >> data_ingestion_task >> data_transformation_task >> model_trainer_task
+    # Define BashOperator task to track and push files with DVC
+    
+data_cleaning_task >> data_ingestion_task >> data_transformation_task >> model_trainer_task >> dvc_task

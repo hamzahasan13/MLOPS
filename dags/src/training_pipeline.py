@@ -27,7 +27,7 @@ class TrainPipeline:
 
             cleaned_df = cleaned_df.sample(n=15300, random_state=42)
             # Specify the path to save the cleaned data
-            cleaned_data_path = os.path.join('artifacts', 'cleaned_data.csv')
+            cleaned_data_path = os.path.join('data_files', 'cleaned_data.csv')
             os.makedirs(os.path.dirname(cleaned_data_path), exist_ok=True)
             
             # Save cleaned data to a new CSV file in the artifacts folder

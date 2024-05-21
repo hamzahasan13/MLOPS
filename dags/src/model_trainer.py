@@ -39,7 +39,7 @@ class SklearnModelWrapper(mlflow.pyfunc.PythonModel):
         return self.model.predict(model_input)
 @dataclass
 class ModelTrainerConfig:
-    trained_model_file_path=os.path.join("artifacts", "model.pkl")
+    trained_model_file_path=os.path.join("data_files", "model.pkl")
 
 class ModelTrainer:
     def __init__(self):

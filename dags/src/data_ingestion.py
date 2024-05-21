@@ -12,9 +12,9 @@ from dataclasses import dataclass
 
 @dataclass
 class DataIngestionConfig:
-    train_data_path: str = os.path.join('artifacts', 'train.csv')
-    test_data_path: str = os.path.join('artifacts', 'test.csv')
-    raw_data_path: str = os.path.join('artifacts', 'data.csv')
+    train_data_path: str = os.path.join('data_files', 'train.csv')
+    test_data_path: str = os.path.join('data_files', 'test.csv')
+    raw_data_path: str = os.path.join('data_files', 'data.csv')
     
 class DataIngestion:
     def __init__(self):
@@ -27,7 +27,7 @@ class DataIngestion:
         
         ## Catches any exceptions that occur during the data ingestion process
         try:
-            df = pd.read_csv('artifacts/cleaned_data.csv')
+            df = pd.read_csv('data_files/cleaned_data.csv')
             logging.info('Read the data into dataframe')
             
             os.makedirs(os.path.dirname(self.ingestion_config.train_data_path), exist_ok=True)
