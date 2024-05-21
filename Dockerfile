@@ -1,8 +1,7 @@
-FROM python:3.9-slim-buster
-WORKDIR /app
-COPY . /app
+# Use the official Airflow image as the base
+FROM apache/airflow:2.8.1
 
-RUN apt update -y
-
-RUN apt-get update && pip install -r requirements.txt
-CMD ["python", "main.py"]
+# Install additional Python packages
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+RUN pip install dvc

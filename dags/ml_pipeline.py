@@ -17,10 +17,10 @@ from src.training_pipeline import TrainPipeline
 tp_obj = TrainPipeline()
 
 with DAG(
-    dag_id = 'Price_Predictor',
+    dag_id = 'Price_Predictor_App',
     default_args = {'retries': 2},
     description = "Training-Pipeline",
-    schedule = "@daily",
+    schedule = "@weekly",
     start_date = pendulum.datetime(2024, 5, 16, tz = "UTC"),
     catchup = False,
     tags = ['MLOps', 'Prediction'],
