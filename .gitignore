@@ -22,3 +22,5 @@ mlruns
 #/artifacts
 
 mlops-423001-ca5c576a17f8.json
+
+./dags/data_files/data.csv/
