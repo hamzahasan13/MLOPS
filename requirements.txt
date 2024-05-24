@@ -16,4 +16,4 @@ pendulum==2.1.2
 ipykernel
 dvc[gs]
 
--e .
+#-e .
