@@ -6,6 +6,7 @@ matplotlib
 missingno
 plotly
 scikit-learn
+pyarrow
 xgboost
 dill
 Flask
@@ -15,4 +16,4 @@ pendulum==2.1.2
 ipykernel
 dvc[gs]
 
-#-e .
+-e .
