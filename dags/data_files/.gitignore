@@ -1,1 +1,2 @@
-./dags/data.csv/
+/data.csv
+dags/data_files/data.csv
