@@ -25,4 +25,4 @@ RUN apt-get update && apt-get install -y \
 
 RUN pip install --upgrade pip
 RUN apt-get update && pip install -r requirements.txt
-CMD ["python", "main.py"]
+CMD ["sh", "-c", "python main.py  --server.port $PORT"]
