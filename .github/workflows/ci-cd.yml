@@ -3,7 +3,7 @@ name: Deploy to Cloud Run
 env:
   SERVICE_NAME: price-app
   PROJECT_ID: mlops-423001
-  DOCKER_IMAGE_URL: us-east1-docker.pkg.dev/mlops-423001/gcr.io/gcr.io
+  DOCKER_IMAGE_URL: us-east1-docker.pkg.dev/mlops-423001/flaskapi/flaskapi
   
 
 on:
