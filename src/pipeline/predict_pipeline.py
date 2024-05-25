@@ -29,7 +29,7 @@ class PredictPipeline:
     
 class CustomData:
     def __init__(self, HorsePower: float, kilometer: float, RiskLevel: str, fuelType: str, vehicleType: str, gearbox: str,
-                 Seller: str, NotRepairedDamaged: str, offerType: str):
+                 Seller: str, NotRepairedDamaged: str):
         
         self.HorsePower = HorsePower
         self.kilometer = kilometer
@@ -39,7 +39,6 @@ class CustomData:
         self.gearbox = gearbox
         self.Seller = Seller
         self.NotRepairedDamaged = NotRepairedDamaged
-        self.offerType = offerType
         
     
     def get_data_as_data_frame(self):
@@ -53,8 +52,7 @@ class CustomData:
                 "vehicleType": [self.vehicleType],
                 "gearbox": [self.gearbox],
                 "Seller": [self.Seller],
-                "NotRepairedDamaged": [self.NotRepairedDamaged],
-                "offerType": [self.offerType]
+                "NotRepairedDamaged": [self.NotRepairedDamaged]
                 
             }
             return pd.DataFrame(custom_data_input_dict)

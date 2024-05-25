@@ -1,10 +1,5 @@
 import pandas as pd
 from sklearn.impute import SimpleImputer
-import os
-import sys
-from src.exception import CustomException
-from src.logger import logging
-import subprocess
 
 class DataCleaning:
     def __init__(self):
@@ -137,7 +132,7 @@ class DataCleaning:
         
         return (df)
     
-    def sample_with_all_categories(self, df, n_samples=15000, random_state=0):
+    def sample_with_all_categories(self, df, n_samples=15300, random_state=0):
         categorical_columns = df.select_dtypes(include=['object', 'category']).columns
         samples_per_category = {}
 

@@ -32,7 +32,7 @@ class DataTransformation:
         
         try:
             numerical_columns = ['HorsePower', 'kilometer']
-            categorical_columns = ['Seller', 'offerType', 'vehicleType', 'gearbox', 'fuelType', 'NotRepairedDamaged','RiskLevel']
+            categorical_columns = ['Seller', 'vehicleType', 'gearbox', 'fuelType', 'NotRepairedDamaged','RiskLevel']
             
             num_pipeline = Pipeline(
                 steps = [
@@ -75,7 +75,7 @@ class DataTransformation:
             
             target_col_name = 'Price'
             numerical_columns = ['HorsePower', 'kilometer']
-            categorical_columns = ['Seller', 'offerType', 'vehicleType', 'gearbox', 'fuelType', 'NotRepairedDamaged','RiskLevel']
+            categorical_columns = ['Seller', 'vehicleType', 'gearbox', 'fuelType', 'NotRepairedDamaged','RiskLevel']
             
             input_feature_train_df = train_df.drop(columns = [target_col_name], axis=1)
             target_feature_train_df = train_df[target_col_name]

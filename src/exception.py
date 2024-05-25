@@ -1,6 +1,4 @@
 import sys
-import logging
-from src.logger import logging
 
     ## When error is raised, this function is called
 def error_message_detail(error, error_detail:sys):

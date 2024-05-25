@@ -1,9 +1,48 @@
-<html>
-    <head>
-        <!-- Linking the CSS file -->
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
-    </head>
-<body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index</title>
+    <style>
+        body {
+            background-image: url("{{ url_for('static', filename='images/wallpaper.jpeg') }}");
+            background-size: cover; /* Ensures the background image covers the entire page */
+            background-repeat: no-repeat; /* Prevents the background image from repeating */
+            background-position: center; /* Centers the background image */
+            background-attachment: fixed; /* Ensures the background image stays fixed during scrolling */
+            margin: 0; /* Removes default margin */
+            padding: 0; /* Removes default padding */
+            height: 100vh; /* Sets the body height to full viewport height */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .login {
+            background-color: rgba(255, 255, 255, 0.8); /* Adds a semi-transparent white background to the form */
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .form-label, .form-control, .btn {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .btn-primary {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .btn-primary:hover {
+            background-color: #45a049; /* Slightly darker green for hover effect */
+        }
+    </style>
+</head>
     <div class="login">
    
        <form action="{{ url_for('predict_datapoint')}}" method="post">
@@ -11,7 +50,7 @@
             <legend>Used Cars Price Predictor</legend>
         </h1>
         <div class="mb-3">
-            <label class="form-label">HorsePower</label>
+            <label class="form-label">Horse Power</label>
             <input class="form-control" type="number" name="HorsePower" placeholder="Enter HorsePower" />
         </div>
         <div class="mb-3">
@@ -19,7 +58,7 @@
             <input class="form-control" type="number" name="kilometer" placeholder="Enter Kilometers Driven" />
         </div>
         <div class="mb-3">
-            <label class="form-label">RiskLevel</label>
+            <label class="form-label">Risk Level</label>
             <select class="form-control" name="RiskLevel" placeholder="Enter Risk Level" required>
                 <option class="placeholder" selected disabled value="">Select Risk Level</option>
                 <option value="Low">
@@ -34,7 +73,7 @@
             </select>
         </div>
         <div class="mb-3">
-            <label class="form-label">fuelType</label>
+            <label class="form-label">Fuel Type</label>
             <select class="form-control" name="fuelType" placeholder="Enter Fuel Type" required>
                 <option class="placeholder" selected disabled value="">Select Fuel Type</option>
                 <option value="Diesel">
@@ -58,7 +97,7 @@
             </select>
         </div>
         <div class="mb-3">
-            <label class="form-label">vehicleType</label>
+            <label class="form-label">Vehicle Type</label>
             <select class="form-control" name="vehicleType" placeholder="Enter Vehicle Type" required>
                 <option class="placeholder" selected disabled value="">Select Vehicle Type</option>
                 <option value="Bus">
@@ -85,7 +124,7 @@
             </select>
         </div>
         <div class="mb-3">
-            <label class="form-label">gearbox</label>
+            <label class="form-label">Gearbox</label>
             <select class="form-control" name="gearbox" placeholder="Enter Gearbox Type" required>
                 <option class="placeholder" selected disabled value="">Select Gearbox Type</option>
                 <option value="Automatic">
@@ -109,9 +148,9 @@
             </select>
         </div>
         <div class="mb-3">
-            <label class="form-label">NotRepairedDamaged</label>
+            <label class="form-label">Repaired_or_Damaged</label>
             <select class="form-control" name="NotRepairedDamaged" placeholder="Enter Not Repaired Damaged" required>
-                <option class="placeholder" selected disabled value="">Select Not Repaired Damaged</option>
+                <option class="placeholder" selected disabled value="">Select Yes/No</option>
                 <option value="Yes">
                     Yes
                 </option>
@@ -121,23 +160,11 @@
             </select>
         </div>
         <div class="mb-3">
-            <label class="form-label">offerType</label>
-            <select class="form-control" name="offerType" placeholder="Enter Offer Type" required>
-                <option class="placeholder" selected disabled value="">Select Offer Type</option>
-                <option value="Customer Offer">
-                    Customer Offer
-                </option>
-                <option value="Company Offer">
-                    Company Offer
-                </option>
-            </select>
-        </div>
-        <div class="mb-3">
             <input class="btn btn-primary" type="submit" value="Predict your Vehicle's Price" />
         </div>
     </form>
     <h2>
-       The predicted price is: ${{results}}
+       Sale Price: ${{results}}
     </h2>
    </body>
 </html>
