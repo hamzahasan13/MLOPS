@@ -43,17 +43,16 @@ class DataCleaning:
         
     def fill_missing(self, df):
         """
-        This function fills the missing values in categorical columns with 'Unknown'.
+        This function fills the missing values in categorical columns with 'Other'.
         """
-        df.loc[:, 'vehicleType'] = df['vehicleType'].fillna("Unknown")
-        df.loc[:, 'gearbox'] = df['gearbox'].fillna("Unknown")
-        df.loc[:, 'model'] = df['model'].fillna("Unknown")
-        df.loc[:, 'fuelType'] = df['fuelType'].fillna("Unknown")
-        df.loc[:, 'NotRepairedDamaged'] = df['NotRepairedDamaged'].fillna("Unknown")
+        df.loc[:, 'vehicleType'] = df['vehicleType'].fillna("Other")
+        df.loc[:, 'gearbox'] = df['gearbox'].fillna("Other")
+        df.loc[:, 'model'] = df['model'].fillna("Other")
+        df.loc[:, 'fuelType'] = df['fuelType'].fillna("Other")
+        df.loc[:, 'NotRepairedDamaged'] = df['NotRepairedDamaged'].fillna("Other")
         
         return df
-        
-        return (df)
+
 
     def capitalize_letters(self, df):
         """
@@ -92,6 +91,10 @@ class DataCleaning:
                                                         'Elektro':'Electric'});
         
         df['NotRepairedDamaged'] = df['NotRepairedDamaged'].replace({'Nein':'No', 'Ja':'Yes'});
+        
+        columns_to_check = ['vehicleType', 'gearbox', 'fuelType', 'NotRepairedDamaged'];
+        for col in columns_to_check:
+            df = df[df[col] != 'Other']
         
         return df
     
@@ -133,6 +136,34 @@ class DataCleaning:
         df.drop(cols_to_drop, axis=1, inplace=True);
         
         return (df)
+    
+    def sample_with_all_categories(self, df, n_samples=15000, random_state=0):
+        categorical_columns = df.select_dtypes(include=['object', 'category']).columns
+        samples_per_category = {}
+
+        for col in categorical_columns:
+            # Find unique values and their counts
+            unique_values = df[col].value_counts().to_dict()
+            samples_per_category[col] = {
+                value: max(1, n_samples // len(unique_values)) for value in unique_values
+            }
+
+        sampled_dfs = []
+
+        for col in categorical_columns:
+            for value, count in samples_per_category[col].items():
+                sampled_dfs.append(df[df[col] == value].sample(count, replace=True))
+
+        # Concatenate all the sampled DataFrames
+        sampled_df = pd.concat(sampled_dfs)
+
+        # Adjust the final sample size to n_samples
+        sampled_df = sampled_df.sample(n=n_samples, random_state=random_state)
+
+        # Reset index to avoid duplicate index issues
+        sampled_df = sampled_df.reset_index(drop=True)
+        
+        return sampled_df
         
     def clean_data(self, df):
         # Apply multiple cleaning functions sequentially
@@ -143,6 +174,7 @@ class DataCleaning:
         df = self.obs_mapping(df)
         df = self.data_filtering(df)
         df = self.drop_cols(df)
+        df = self.sample_with_all_categories(df)
         
         return df
     """

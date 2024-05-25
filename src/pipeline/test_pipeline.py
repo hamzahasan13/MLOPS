@@ -7,6 +7,7 @@ from src.exception import CustomException
 import sys
 import os
 import pandas as pd
+from sklearn.model_selection import StratifiedShuffleSplit
     
 
 try:
@@ -22,8 +23,13 @@ try:
     
     # Clean the data using multiple cleaning functions
     cleaned_df = dc_obj.clean_data(df)
+    
+    
 
-    cleaned_df = cleaned_df.sample(n=15300, random_state=42)
+    # Display the final sample size
+    #print(f"Final sample size: {sampled_df.shape}")
+
+    #cleaned_df = cleaned_df.sample(n=15300, random_state=42)
     # Specify the path to save the cleaned data
     cleaned_data_path = os.path.join('artifacts', 'cleaned_data.csv')
     os.makedirs(os.path.dirname(cleaned_data_path), exist_ok=True)
