@@ -209,7 +209,7 @@ class ModelTrainer:
             
             
             ## Loads the model in production stage and then makes prediction
-            model = mlflow.pyfunc.load_model(f"models:/{model_name}/{'Production'}/model")
+            #model = mlflow.pyfunc.load_model(f"models:/{model_name}/{'Production'}/model")
             #pred = model.predict(X_test);
             #r2_sq_new = round(r2_score(y_test, pred), 2)
             

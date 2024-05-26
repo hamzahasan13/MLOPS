@@ -24,12 +24,6 @@ try:
     # Clean the data using multiple cleaning functions
     cleaned_df = dc_obj.clean_data(df)
     
-    
-
-    # Display the final sample size
-    #print(f"Final sample size: {sampled_df.shape}")
-
-    #cleaned_df = cleaned_df.sample(n=15300, random_state=42)
     # Specify the path to save the cleaned data
     cleaned_data_path = os.path.join('artifacts', 'cleaned_data.csv')
     os.makedirs(os.path.dirname(cleaned_data_path), exist_ok=True)
@@ -37,11 +31,11 @@ try:
     # Save cleaned data to a new CSV file in the artifacts folder
     cleaned_df.to_csv(cleaned_data_path, index=False)
     #data_path = 'artifacts/cleaned_data.csv'
-    """
+    
     dc_obj.initialize_dvc()
     dc_obj.run_dvc_command(f"{data_path}")
     dc_obj.run_dvc_command(f"{cleaned_data_path}")
-    """
+    
     logging.info('Data cleaning process completed')
     
     di_obj = DataIngestion()

@@ -1,6 +1,9 @@
 import pandas as pd
 from sklearn.impute import SimpleImputer
-
+from src.exception import CustomException
+import sys
+import subprocess
+import os
 class DataCleaning:
     def __init__(self):
         pass
@@ -172,7 +175,7 @@ class DataCleaning:
         df = self.sample_with_all_categories(df)
         
         return df
-    """
+    
     def initialize_dvc(self):
         if not os.path.exists(".dvc"):
             try:
@@ -191,4 +194,3 @@ class DataCleaning:
     
         except CustomException as e:
             print(e, sys)
-    """

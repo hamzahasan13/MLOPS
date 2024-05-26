@@ -42,16 +42,17 @@ with DAG(
     dvc_task = BashOperator(
         task_id='initialize_and_push_dvc',
         bash_command=initialize_and_push_dvc(),
+        dvc add artifacts/cleaned_data.csv artifacts/data.csv artifacts/train.csv artifacts/test.csv
     )
     """
     
     def initialize_and_push_dvc(gcs_bucket_name, gcs_credentials_path):
         bash_command = f"""
         if [ ! -d .dvc ]; then
-            dvc init -f && \
+            dvc init --no-scm && \
             dvc remote add -d myremote4 gs://{gcs_bucket_name} && \
-            dvc remote modify myremote4 gcs_credentials_file {gcs_credentials_path} && \
-            dvc add artifacts/cleaned_data.csv artifacts/data.csv artifacts/train.csv artifacts/test.csv && \
+            dvc remote modify myremote4 credentialpath {gcs_credentials_path} && \
+            dvc add data_files/data.csv && \
             dvc push
             echo "DVC initialized successfully and pushed to GCS bucket."
         else

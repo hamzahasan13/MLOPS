@@ -42,11 +42,11 @@ class DataIngestion:
             train_set.to_csv(self.ingestion_config.train_data_path, index=False, header=True)
             test_set.to_csv(self.ingestion_config.test_data_path, index=False, header=True)
             
-            """
+            
             DataCleaning().run_dvc_command(f"{self.ingestion_config.train_data_path}")
             DataCleaning().run_dvc_command(f"{self.ingestion_config.test_data_path}")
             DataCleaning().run_dvc_command(f"{self.ingestion_config.raw_data_path}")
-            """
+            
             
             logging.info('Ingestion of the data is completed')
             

@@ -3,8 +3,8 @@ FROM apache/airflow:2.8.1 AS airflow
 
 # Install additional Python packages
 COPY requirements.txt .
+#COPY /artifacts .
 RUN pip install -r requirements.txt
-RUN pip install dvc
 
 # Stage 2: Build the Flask image
 FROM python:3.9-slim-buster AS flask
@@ -25,4 +25,5 @@ RUN apt-get update && apt-get install -y \
 
 RUN pip install --upgrade pip
 RUN apt-get update && pip install -r requirements.txt
+
 CMD ["sh", "-c", "python main.py  --server.port $PORT"]
